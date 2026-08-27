@@ -11,7 +11,7 @@
       "unitPrice": 25000,
       "locationRack": "Rack A-01",
       "description": "",
-      "updatedAt": "2026-08-27T09:37:42.559Z"
+      "updatedAt": "2026-08-27T09:50:56.513Z"
     }
   ],
   "technicians": [
@@ -131,7 +131,7 @@
         "totalCost": "33760"
       },
       "createdAt": "2026-08-27T07:36:54.196Z",
-      "updatedAt": "2026-08-27T09:37:42.559Z"
+      "updatedAt": "2026-08-27T09:50:56.513Z"
     }
   ],
   "inventoryTransactions": [
