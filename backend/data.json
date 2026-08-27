@@ -11,7 +11,7 @@
       "unitPrice": 25000,
       "locationRack": "Rack A-01",
       "description": "",
-      "updatedAt": "2026-08-27T09:54:57.134Z"
+      "updatedAt": "2026-08-27T10:13:22.492Z"
     }
   ],
   "technicians": [
@@ -83,57 +83,7 @@
       ]
     }
   ],
-  "dispatches": [
-    {
-      "id": "dsp-bb4e2e03",
-      "dispatchCode": "DSP-2026-0001",
-      "clientName": "GVP FORWARDER PVT LTD.",
-      "siteAddress": "217, MAHINDRA CHEMBER, W.T.PATIL MARG, CHEMBUR, MUMBAI 400071",
-      "contactPerson": "",
-      "forkliftModel": "OM VOLTAS EVX30-HVT2100 3 TON, TOYOTA BT RRE8 2.5 TON [ALL]",
-      "forkliftSerialNo": "",
-      "issueDescription": "• ✅ Pump Motor & Contactor Replacement\n• ✅ Controller Diagnostic & Error Reset\n• ❌ Battery / Gravity Check & Top-up\n  ⚠️ (Reason: Water not gravity)",
-      "dispatchDate": "Outward: 2026-08-27 (01:04 PM)\nReturned: 2026-08-27 (01:07 PM)",
-      "dispatchTime": "01:04 PM",
-      "leadTechnician": "Datta Shinde\n(Helpers: Malik wadkar, Faizal Mirza)",
-      "teamMembers": [
-        "Malik wadkar",
-        "Faizal Mirza"
-      ],
-      "status": "COMPLETED",
-      "itemsIssued": [
-        {
-          "partId": "part-9a950b49",
-          "partNumber": "6534",
-          "partName": "Hydraulic Pump",
-          "category": "Hydraulics",
-          "unit": "Nos",
-          "unitPrice": 25000,
-          "qtyIssued": 1,
-          "qtyUsed": 1,
-          "qtyReturned": 0,
-          "qtyDamaged": 0,
-          "itemStatus": "USED",
-          "installationNotes": ""
-        }
-      ],
-      "notes": "",
-      "returnDate": "2026-08-27",
-      "returnTime": "01:07 PM",
-      "workSummary": "• ✅ Pump Motor & Contactor Replacement\n• ✅ Controller Diagnostic & Error Reset\n• ❌ Battery / Gravity Check & Top-up\n  ⚠️ (Reason: Water not gravity)",
-      "verifiedBy": "Datta Shinde",
-      "customerSignOff": true,
-      "customerRemarks": "",
-      "costBreakdown": {
-        "partsCost": "25000",
-        "travellingCost": "500",
-        "otherCost": "8260 (Tool purchase)",
-        "totalCost": "33760"
-      },
-      "createdAt": "2026-08-27T07:36:54.196Z",
-      "updatedAt": "2026-08-27T09:54:57.134Z"
-    }
-  ],
+  "dispatches": [],
   "inventoryTransactions": [
     {
       "id": "tx-eba139a2",

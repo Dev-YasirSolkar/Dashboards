@@ -284,10 +284,11 @@ export default function TechniciansClients() {
               {(() => {
                 let forkliftList = [];
                 if (Array.isArray(cli.forklifts)) {
-                  forkliftList = cli.forklifts.flatMap(f => String(f).split(',')).map(s => s.trim()).filter(Boolean);
+                  forkliftList = cli.forklifts.flatMap(f => String(f).split(/,|\n/));
                 } else if (typeof cli.forklifts === 'string') {
-                  forkliftList = cli.forklifts.split(',').map(s => s.trim()).filter(Boolean);
+                  forkliftList = cli.forklifts.split(/,|\n/);
                 }
+                forkliftList = forkliftList.map(s => String(s).replace(/^[•\*\-\s]+/, '').trim()).filter(Boolean);
 
                 if (forkliftList.length === 0) return null;
 

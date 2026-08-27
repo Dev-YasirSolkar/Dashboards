@@ -140,16 +140,23 @@ export default function NewDispatch({ setActiveTab, onDataRefresh }) {
     loadAllMasterData();
   }, []);
 
+  const parseForkliftList = (rawForklifts) => {
+    if (!rawForklifts) return [];
+    let items = [];
+    if (Array.isArray(rawForklifts)) {
+      items = rawForklifts.flatMap(f => String(f).split(/,|\n/));
+    } else if (typeof rawForklifts === 'string') {
+      items = rawForklifts.split(/,|\n/);
+    }
+    return items
+      .map(s => String(s).replace(/^[•\*\-\s]+/, '').trim())
+      .filter(Boolean);
+  };
+
   const availableSiteMachines = React.useMemo(() => {
     const currentClient = clients.find(c => c.id === selectedClientId || c.clientName === clientName);
     if (!currentClient || !currentClient.forklifts) return [];
-    if (Array.isArray(currentClient.forklifts)) {
-      return currentClient.forklifts.flatMap(f => String(f).split(',')).map(s => s.trim()).filter(Boolean);
-    }
-    if (typeof currentClient.forklifts === 'string') {
-      return currentClient.forklifts.split(',').map(s => s.trim()).filter(Boolean);
-    }
-    return [];
+    return parseForkliftList(currentClient.forklifts);
   }, [clients, selectedClientId, clientName]);
 
   const handleSelectClient = (cli) => {
@@ -158,12 +165,7 @@ export default function NewDispatch({ setActiveTab, onDataRefresh }) {
     setSiteAddress(cli.siteAddress || 'Client Site');
     setContactPerson(cli.contactPerson || '');
 
-    let machines = [];
-    if (Array.isArray(cli.forklifts)) {
-      machines = cli.forklifts.flatMap(f => String(f).split(',')).map(s => s.trim()).filter(Boolean);
-    } else if (typeof cli.forklifts === 'string') {
-      machines = cli.forklifts.split(',').map(s => s.trim()).filter(Boolean);
-    }
+    const machines = parseForkliftList(cli.forklifts);
 
     if (machines.length > 0) {
       setSelectedForklifts([machines[0]]);
