@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-900 text-slate-100 font-sans antialiased selection:bg-amber-500 selection:text-slate-950;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* High Precision Official Job Card Print Styles */
+@media print {
+  html, body {
+    background: white !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    font-size: 10pt !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Completely hide all screen elements outside the Job Card */
+  header, nav, main, footer, .no-print, button, .backdrop-blur-sm, .backdrop-blur-md {
+    display: none !important;
+  }
+
+  body > *:not(#root) {
+    display: none !important;
+  }
+
+  .fixed.inset-0 {
+    position: static !important;
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+    overflow: visible !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  #printable-job-card {
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 16px 20px !important;
+    background: white !important;
+    color: #0f172a !important;
+    border: 2px solid #0f172a !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+    page-break-after: avoid !important;
+    page-break-inside: avoid !important;
+    overflow: hidden !important;
+  }
+
+  /* Table borders & colors in print */
+  #printable-job-card table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    background: white !important;
+  }
+
+  #printable-job-card th {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+    border: 1px solid #94a3b8 !important;
+    font-weight: 800 !important;
+  }
+
+  #printable-job-card td {
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+  }
+
+  #printable-job-card .bg-slate-950\/70,
+  #printable-job-card .bg-slate-950\/50,
+  #printable-job-card .bg-slate-950\/60,
+  #printable-job-card .bg-slate-950\/40 {
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+  }
+
+  #printable-job-card strong,
+  #printable-job-card h1,
+  #printable-job-card h2,
+  #printable-job-card h3 {
+    color: #0f172a !important;
+  }
+
+  #printable-job-card p,
+  #printable-job-card span {
+    color: #334155 !important;
+  }
+
+  #printable-job-card .text-amber-400,
+  #printable-job-card .text-amber-300 {
+    color: #b45309 !important;
+    font-weight: bold !important;
+  }
+
+  #printable-job-card .text-emerald-400,
+  #printable-job-card .text-emerald-300 {
+    color: #047857 !important;
+    font-weight: bold !important;
+  }
+
+  #printable-job-card .text-blue-400,
+  #printable-job-card .text-blue-300 {
+    color: #1d4ed8 !important;
+    font-weight: bold !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 8mm 10mm;
+  }
+}

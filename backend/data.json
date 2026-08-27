@@ -1,0 +1,460 @@
+{
+  "inventory": [
+    {
+      "id": "part-9a950b49",
+      "partNumber": "6534",
+      "name": "Hydraulic Pump",
+      "category": "Hydraulics",
+      "stockQuantity": 0,
+      "minAlertQuantity": 2,
+      "unit": "Nos",
+      "unitPrice": 25000,
+      "locationRack": "Rack A-01",
+      "description": "",
+      "updatedAt": "2026-08-27T09:37:42.559Z"
+    }
+  ],
+  "technicians": [
+    {
+      "id": "tech-4d4a0081",
+      "name": "Datta Shinde",
+      "phone": "9136393858",
+      "designation": "Senior Forklift Mechanic",
+      "experience": "10+ Years",
+      "status": "Available"
+    },
+    {
+      "id": "tech-c0a2fd40",
+      "name": "Malik wadkar",
+      "phone": "8286334626",
+      "designation": "Senior Forklift Mechanic",
+      "experience": "5+ Years",
+      "status": "Available"
+    },
+    {
+      "id": "tech-dd51a10d",
+      "name": "Faizal Mirza",
+      "phone": "9820618858",
+      "designation": "Helper / Trainee",
+      "experience": "2 Years",
+      "status": "Available"
+    },
+    {
+      "id": "tech-dc92d902",
+      "name": "Mashiulla Pasha",
+      "phone": "8125066864",
+      "designation": "Helper / Trainee",
+      "experience": "1 Year",
+      "status": "Available"
+    },
+    {
+      "id": "tech-8b98130f",
+      "name": "Imtiyaz Ali",
+      "phone": "8655671028",
+      "designation": "Senior Forklift Mechanic",
+      "experience": "3 Years",
+      "status": "Available"
+    },
+    {
+      "id": "tech-daedfa98",
+      "name": "Akash Saroj",
+      "phone": "9321606345",
+      "designation": "Helper / Trainee",
+      "experience": "2 Years",
+      "status": "Available"
+    },
+    {
+      "id": "tech-1fa45856",
+      "name": "Yasir Solkar",
+      "phone": "9370853996",
+      "designation": "Manager Assistant",
+      "experience": "2 Years",
+      "status": "Available"
+    }
+  ],
+  "clients": [
+    {
+      "id": "cli-b635df98",
+      "clientName": "GVP FORWARDER PVT LTD.",
+      "siteAddress": "217, MAHINDRA CHEMBER, W.T.PATIL MARG, CHEMBUR, MUMBAI 400071",
+      "contactPerson": "N/A",
+      "forklifts": [
+        "• OM VOLTAS EVX30-HVT2100 3 TON\n• TOYOTA BT RRE160E 1.6 TON\n• TOYOTA BT RRE8 2.5 TON\n• TOYOTA BT RRE160E 1.6 TON\n• VOLTAS MAX EVX20-HVT 2100 3 TON"
+      ]
+    }
+  ],
+  "dispatches": [
+    {
+      "id": "dsp-bb4e2e03",
+      "dispatchCode": "DSP-2026-0001",
+      "clientName": "GVP FORWARDER PVT LTD.",
+      "siteAddress": "217, MAHINDRA CHEMBER, W.T.PATIL MARG, CHEMBUR, MUMBAI 400071",
+      "contactPerson": "",
+      "forkliftModel": "OM VOLTAS EVX30-HVT2100 3 TON, TOYOTA BT RRE8 2.5 TON [ALL]",
+      "forkliftSerialNo": "",
+      "issueDescription": "• ✅ Pump Motor & Contactor Replacement\n• ✅ Controller Diagnostic & Error Reset\n• ❌ Battery / Gravity Check & Top-up\n  ⚠️ (Reason: Water not gravity)",
+      "dispatchDate": "Outward: 2026-08-27 (01:04 PM)\nReturned: 2026-08-27 (01:07 PM)",
+      "dispatchTime": "01:04 PM",
+      "leadTechnician": "Datta Shinde\n(Helpers: Malik wadkar, Faizal Mirza)",
+      "teamMembers": [
+        "Malik wadkar",
+        "Faizal Mirza"
+      ],
+      "status": "COMPLETED",
+      "itemsIssued": [
+        {
+          "partId": "part-9a950b49",
+          "partNumber": "6534",
+          "partName": "Hydraulic Pump",
+          "category": "Hydraulics",
+          "unit": "Nos",
+          "unitPrice": 25000,
+          "qtyIssued": 1,
+          "qtyUsed": 1,
+          "qtyReturned": 0,
+          "qtyDamaged": 0,
+          "itemStatus": "USED",
+          "installationNotes": ""
+        }
+      ],
+      "notes": "",
+      "returnDate": "2026-08-27",
+      "returnTime": "01:07 PM",
+      "workSummary": "• ✅ Pump Motor & Contactor Replacement\n• ✅ Controller Diagnostic & Error Reset\n• ❌ Battery / Gravity Check & Top-up\n  ⚠️ (Reason: Water not gravity)",
+      "verifiedBy": "Datta Shinde",
+      "customerSignOff": true,
+      "customerRemarks": "",
+      "costBreakdown": {
+        "partsCost": "25000",
+        "travellingCost": "500",
+        "otherCost": "8260 (Tool purchase)",
+        "totalCost": "33760"
+      },
+      "createdAt": "2026-08-27T07:36:54.196Z",
+      "updatedAt": "2026-08-27T09:37:42.559Z"
+    }
+  ],
+  "inventoryTransactions": [
+    {
+      "id": "tx-eba139a2",
+      "timestamp": "2026-08-26T10:34:03.439Z",
+      "type": "DISPATCH_OUT",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": -1,
+      "balanceAfter": 4,
+      "referenceId": "DSP-2026-0001",
+      "employeeName": "Datta Shinde",
+      "notes": "Dispatched to JSW JFE ELECTRICAL STEEL for Toyota 2.5T [ALL]"
+    },
+    {
+      "id": "tx-516e7e86",
+      "timestamp": "2026-08-26T10:39:59.811Z",
+      "type": "DISPATCH_CANCELLED",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": 1,
+      "balanceAfter": 5,
+      "referenceId": "DSP-2026-0001",
+      "notes": "Cancelled dispatch DSP-2026-0001 - Stock rolled back"
+    },
+    {
+      "id": "tx-7ddc96e3",
+      "timestamp": "2026-08-26T10:40:18.205Z",
+      "type": "DISPATCH_OUT",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": -1,
+      "balanceAfter": 4,
+      "referenceId": "DSP-2026-0001",
+      "employeeName": "Datta Shinde",
+      "notes": "Dispatched to JSW JFE ELECTRICAL STEEL for Toyota 2.5T [ALL]"
+    },
+    {
+      "id": "tx-170cc0a5",
+      "timestamp": "2026-08-26T10:40:29.515Z",
+      "type": "DISPATCH_CANCELLED",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": 1,
+      "balanceAfter": 5,
+      "referenceId": "DSP-2026-0001",
+      "notes": "Cancelled dispatch DSP-2026-0001 - Stock rolled back"
+    },
+    {
+      "id": "tx-c532e543",
+      "timestamp": "2026-08-26T10:51:21.519Z",
+      "type": "DISPATCH_OUT",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": -1,
+      "balanceAfter": 4,
+      "referenceId": "DSP-2026-0001",
+      "employeeName": "Datta Shinde",
+      "notes": "Dispatched to JSW JFE ELECTRICAL STEEL for Toyota 2.5T [ALL]"
+    },
+    {
+      "id": "tx-bab50db1",
+      "timestamp": "2026-08-26T10:52:19.442Z",
+      "type": "RETURN_RESTOCK",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": 1,
+      "balanceAfter": 5,
+      "referenceId": "DSP-2026-0001",
+      "employeeName": "Datta Shinde\n(Helpers: Malik wadkar, Faizal Mirza, Mashiulla Pasha)",
+      "notes": "Returned unused from site visit DSP-2026-0001 (JSW JFE ELECTRICAL STEEL)"
+    },
+    {
+      "id": "tx-b3a68a76",
+      "timestamp": "2026-08-26T11:02:50.809Z",
+      "type": "DISPATCH_OUT",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": -1,
+      "balanceAfter": 4,
+      "referenceId": "DSP-2026-0001",
+      "employeeName": "Datta Shinde",
+      "notes": "Dispatched to JSW JFE ELECTRICAL STEEL for Toyota 2.5T [ALL]"
+    },
+    {
+      "id": "tx-4672be17",
+      "timestamp": "2026-08-26T11:04:33.387Z",
+      "type": "RETURN_RESTOCK",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": 1,
+      "balanceAfter": 5,
+      "referenceId": "DSP-2026-0001",
+      "employeeName": "Datta Shinde\n(Helpers: Malik wadkar, Faizal Mirza)",
+      "notes": "Returned unused from site visit DSP-2026-0001 (JSW JFE ELECTRICAL STEEL)"
+    },
+    {
+      "id": "tx-20991504",
+      "timestamp": "2026-08-26T11:12:47.797Z",
+      "type": "DISPATCH_OUT",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": -1,
+      "balanceAfter": 4,
+      "referenceId": "DSP-2026-0001",
+      "employeeName": "Datta Shinde",
+      "notes": "Dispatched to JSW JFE ELECTRICAL STEEL for Toyota 2.5T [ALL]"
+    },
+    {
+      "id": "tx-fdbed842",
+      "timestamp": "2026-08-26T11:14:39.611Z",
+      "type": "RETURN_RESTOCK",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": 1,
+      "balanceAfter": 5,
+      "referenceId": "DSP-2026-0001",
+      "employeeName": "Datta Shinde\n(Helpers: Malik wadkar, Faizal Mirza, Mashiulla Pasha)",
+      "notes": "Returned unused from site visit DSP-2026-0001 (JSW JFE ELECTRICAL STEEL)"
+    },
+    {
+      "id": "tx-b9458406",
+      "timestamp": "2026-08-26T11:16:33.393Z",
+      "type": "DISPATCH_OUT",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": -1,
+      "balanceAfter": 4,
+      "referenceId": "DSP-2026-0002",
+      "employeeName": "Datta Shinde",
+      "notes": "Dispatched to JSW JFE ELECTRICAL STEEL for Toyota 2.5T [ALL]"
+    },
+    {
+      "id": "tx-6376d169",
+      "timestamp": "2026-08-26T11:17:22.963Z",
+      "type": "RETURN_RESTOCK",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": 1,
+      "balanceAfter": 5,
+      "referenceId": "DSP-2026-0002",
+      "employeeName": "Datta Shinde\n(Helpers: Malik wadkar, Faizal Mirza)",
+      "notes": "Returned unused from site visit DSP-2026-0002 (JSW JFE ELECTRICAL STEEL)"
+    },
+    {
+      "id": "tx-dbd3df8e",
+      "timestamp": "2026-08-27T06:00:28.381Z",
+      "type": "DISPATCH_OUT",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": -1,
+      "balanceAfter": 4,
+      "referenceId": "DSP-2026-0001",
+      "employeeName": "Datta Shinde",
+      "notes": "Dispatched to JSW JFE ELECTRICAL STEEL for Toyota 2.5T [ALL]"
+    },
+    {
+      "id": "tx-6c309677",
+      "timestamp": "2026-08-27T06:01:13.496Z",
+      "type": "RETURN_RESTOCK",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": 1,
+      "balanceAfter": 5,
+      "referenceId": "DSP-2026-0001",
+      "employeeName": "Datta Shinde\n(Helpers: Malik wadkar, Faizal Mirza, Mashiulla Pasha)",
+      "notes": "Returned unused from site visit DSP-2026-0001 (JSW JFE ELECTRICAL STEEL)"
+    },
+    {
+      "id": "tx-ea8208cd",
+      "timestamp": "2026-08-27T06:01:55.077Z",
+      "type": "DISPATCH_OUT",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": -1,
+      "balanceAfter": 4,
+      "referenceId": "DSP-2026-0002",
+      "employeeName": "Datta Shinde",
+      "notes": "Dispatched to JSW JFE ELECTRICAL STEEL for Toyota 2.5T [ALL]"
+    },
+    {
+      "id": "tx-9883d7f1",
+      "timestamp": "2026-08-27T06:02:50.660Z",
+      "type": "DISPATCH_OUT",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": -1,
+      "balanceAfter": 3,
+      "referenceId": "DSP-2026-0003",
+      "employeeName": "Datta Shinde",
+      "notes": "Dispatched to JSW JFE ELECTRICAL STEEL for Toyota 2.5T [ALL]"
+    },
+    {
+      "id": "tx-4a554738",
+      "timestamp": "2026-08-27T06:14:41.031Z",
+      "type": "DISPATCH_OUT",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": -1,
+      "balanceAfter": 3,
+      "referenceId": "DSP-2026-0003",
+      "employeeName": "Datta Shinde",
+      "notes": "Dispatched to JSW JFE ELECTRICAL STEEL for Toyota 2.5T [ALL]"
+    },
+    {
+      "id": "tx-6da1d1aa",
+      "timestamp": "2026-08-27T06:16:50.190Z",
+      "type": "DISPATCH_OUT",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": -1,
+      "balanceAfter": 2,
+      "referenceId": "DSP-2026-0004",
+      "employeeName": "Datta Shinde",
+      "notes": "Dispatched to JSW JFE ELECTRICAL STEEL for Toyota 2.5T [ALL]"
+    },
+    {
+      "id": "tx-1d81f187",
+      "timestamp": "2026-08-27T06:19:55.058Z",
+      "type": "DISPATCH_OUT",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": -1,
+      "balanceAfter": 1,
+      "referenceId": "DSP-2026-0005",
+      "employeeName": "Datta Shinde",
+      "notes": "Dispatched to JSW JFE ELECTRICAL STEEL for Toyota 2.5T [ALL]"
+    },
+    {
+      "id": "tx-96f10c1c",
+      "timestamp": "2026-08-27T06:20:24.624Z",
+      "type": "RETURN_RESTOCK",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": 1,
+      "balanceAfter": 2,
+      "referenceId": "DSP-2026-0005",
+      "employeeName": "Datta Shinde\n(Helpers: Malik wadkar, Faizal Mirza)",
+      "notes": "Returned unused from site visit DSP-2026-0005 (JSW JFE ELECTRICAL STEEL)"
+    },
+    {
+      "id": "tx-c2e8425c",
+      "timestamp": "2026-08-27T06:35:12.059Z",
+      "type": "DISPATCH_OUT",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": -1,
+      "balanceAfter": 1,
+      "referenceId": "DSP-2026-0001",
+      "employeeName": "Datta Shinde",
+      "notes": "Dispatched to JSW JFE ELECTRICAL STEEL for Toyota 2.5T [ALL]"
+    },
+    {
+      "id": "tx-ca94fa59",
+      "timestamp": "2026-08-27T06:43:28.639Z",
+      "type": "DISPATCH_OUT",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": -1,
+      "balanceAfter": 1,
+      "referenceId": "DSP-2026-0001",
+      "employeeName": "Datta Shinde",
+      "notes": "Dispatched to JSW JFE ELECTRICAL STEEL for Toyota 2.5T [ALL]"
+    },
+    {
+      "id": "tx-13dc895a",
+      "timestamp": "2026-08-27T07:36:54.199Z",
+      "type": "DISPATCH_OUT",
+      "partId": "part-9a950b49",
+      "partNumber": "6534",
+      "partName": "Hydraulic Pump",
+      "quantityChanged": -1,
+      "balanceAfter": 0,
+      "referenceId": "DSP-2026-0001",
+      "employeeName": "Datta Shinde",
+      "notes": "Dispatched to GVP FORWARDER PVT LTD. for OM VOLTAS EVX30-HVT2100 3 TON, TOYOTA BT RRE8 2.5 TON [ALL]"
+    }
+  ],
+  "users": [
+    {
+      "uid": "juoQofnkViXcZn9Cg1F6haV8Q2j2",
+      "email": "mypresentation12911@gmail.com",
+      "displayName": "Master Admin",
+      "role": "ADMIN",
+      "status": "APPROVED",
+      "createdAt": "2026-08-26T10:09:50.040Z",
+      "approvedAt": "2026-08-26T10:09:50.040Z",
+      "approvedBy": "SYSTEM_SUPER_ADMIN"
+    },
+    {
+      "uid": "NlZmBKKWzlZe8x2RgMlElUoOqNh2",
+      "email": "mashiullaulla@gmail.com",
+      "displayName": "mashiullaulla",
+      "role": "STAFF",
+      "status": "APPROVED",
+      "createdAt": "2026-08-26T11:09:13.975Z",
+      "approvedAt": "2026-08-26T11:09:26.126Z",
+      "approvedBy": "Admin",
+      "lastLoginAt": "2026-08-26T11:16:53.135Z",
+      "updatedAt": "2026-08-26T11:09:26.126Z"
+    }
+  ]
+}
