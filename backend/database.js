@@ -1,9 +1,5 @@
-const fs = require('fs');
-const path = require('path');
 const { randomUUID } = require('crypto');
 const uuidv4 = randomUUID;
-
-const DATA_FILE = path.join(__dirname, 'data.json');
 
 const INITIAL_DATA = {
   inventory: [],
@@ -14,9 +10,55 @@ const INITIAL_DATA = {
   users: []
 };
 
-// Initialize Firebase Web SDK dynamically from frontend node_modules
+// In-Memory RAM Cache (No data.json file!)
+let cachedDb = { ...INITIAL_DATA };
+
+// Firebase Web SDK
 let auth, firestore, doc, getDoc, setDoc;
 let isFirestoreInitialized = false;
+
+async function pullFromFirestore() {
+  if (!isFirestoreInitialized || !firestore || !doc || !getDoc) return;
+  try {
+    const docRef = doc(firestore, 'app_data', 'state');
+    const snap = await getDoc(docRef);
+    if (snap.exists()) {
+      const data = snap.data();
+      if (data && typeof data === 'object') {
+        cachedDb = {
+          inventory: Array.isArray(data.inventory) ? data.inventory : [],
+          technicians: Array.isArray(data.technicians) ? data.technicians : [],
+          clients: Array.isArray(data.clients) ? data.clients : [],
+          dispatches: Array.isArray(data.dispatches) ? data.dispatches : [],
+          inventoryTransactions: Array.isArray(data.inventoryTransactions) ? data.inventoryTransactions : [],
+          users: Array.isArray(data.users) ? data.users : []
+        };
+        console.log('[Cloud Firestore] Successfully pulled live state from Cloud Firestore!');
+      }
+    }
+  } catch (err) {
+    console.warn('[Cloud Firestore] Pull warning:', err.message);
+  }
+}
+
+async function pushToFirestore(data) {
+  if (!isFirestoreInitialized || !firestore || !doc || !setDoc) return;
+  try {
+    const docRef = doc(firestore, 'app_data', 'state');
+    await setDoc(docRef, {
+      inventory: data.inventory || [],
+      technicians: data.technicians || [],
+      clients: data.clients || [],
+      dispatches: data.dispatches || [],
+      inventoryTransactions: data.inventoryTransactions || [],
+      users: data.users || [],
+      updatedAt: new Date().toISOString()
+    });
+    console.log('[Cloud Firestore] Successfully saved database state to Cloud Firestore!');
+  } catch (err) {
+    console.warn('[Cloud Firestore] Push warning:', err.message);
+  }
+}
 
 async function initFirestore() {
   try {
@@ -50,93 +92,30 @@ async function initFirestore() {
         try {
           await createUserWithEmailAndPassword(auth, email, password);
         } catch (cErr) {
-          console.warn('[Firestore Auth] User creation warn:', cErr.message);
+          console.warn('[Cloud Firestore Auth] User creation warn:', cErr.message);
         }
       }
     }
 
     isFirestoreInitialized = true;
-    console.log('[Firestore] Connected & Authenticated successfully on project lucky-draw-7k8ft!');
+    console.log('[Cloud Firestore] Connected & Authenticated successfully on project lucky-draw-7k8ft!');
+    await pullFromFirestore();
   } catch (err) {
-    console.warn('[Firestore] Initialization warning:', err.message);
-  }
-}
-
-let cachedDb = null;
-
-function initDatabase() {
-  try {
-    if (!fs.existsSync(DATA_FILE)) {
-      fs.writeFileSync(DATA_FILE, JSON.stringify(INITIAL_DATA, null, 2), 'utf8');
-    }
-    const content = fs.readFileSync(DATA_FILE, 'utf8');
-    cachedDb = JSON.parse(content);
-  } catch (err) {
-    console.error('Error initializing database:', err);
-    cachedDb = JSON.parse(JSON.stringify(INITIAL_DATA));
-    fs.writeFileSync(DATA_FILE, JSON.stringify(cachedDb, null, 2), 'utf8');
-  }
-}
-
-async function pullFromFirestore() {
-  if (!isFirestoreInitialized || !firestore || !doc || !getDoc) return;
-  try {
-    const docRef = doc(firestore, 'app_data', 'state');
-    const snap = await getDoc(docRef);
-    if (snap.exists()) {
-      const data = snap.data();
-      if (data && typeof data === 'object') {
-        cachedDb = {
-          inventory: Array.isArray(data.inventory) ? data.inventory : [],
-          technicians: Array.isArray(data.technicians) ? data.technicians : [],
-          clients: Array.isArray(data.clients) ? data.clients : [],
-          dispatches: Array.isArray(data.dispatches) ? data.dispatches : [],
-          inventoryTransactions: Array.isArray(data.inventoryTransactions) ? data.inventoryTransactions : [],
-          users: Array.isArray(data.users) ? data.users : []
-        };
-        fs.writeFileSync(DATA_FILE, JSON.stringify(cachedDb, null, 2), 'utf8');
-        console.log('[Firestore] Successfully pulled live state from Cloud Firestore!');
-      }
-    }
-  } catch (err) {
-    console.warn('[Firestore] Pull warning:', err.message);
-  }
-}
-
-async function pushToFirestore(data) {
-  if (!isFirestoreInitialized || !firestore || !doc || !setDoc) return;
-  try {
-    const docRef = doc(firestore, 'app_data', 'state');
-    await setDoc(docRef, {
-      inventory: data.inventory || [],
-      technicians: data.technicians || [],
-      clients: data.clients || [],
-      dispatches: data.dispatches || [],
-      inventoryTransactions: data.inventoryTransactions || [],
-      users: data.users || [],
-      updatedAt: new Date().toISOString()
-    });
-    console.log('[Firestore] Successfully synced database state to Cloud Firestore!');
-  } catch (err) {
-    console.warn('[Firestore] Push warning:', err.message);
+    console.warn('[Cloud Firestore] Initialization warning:', err.message);
   }
 }
 
 function getDatabase() {
-  if (!cachedDb) {
-    initDatabase();
-  }
   return cachedDb;
 }
 
 function saveDatabase(data) {
   try {
     cachedDb = data;
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
     
-    // Async background sync to Cloud Firestore
+    // Save directly to Cloud Firebase Firestore
     pushToFirestore(data).catch(err => {
-      console.warn('[Firestore] Async save warning:', err.message);
+      console.warn('[Cloud Firestore] Save warning:', err.message);
     });
 
     return true;
@@ -146,14 +125,15 @@ function saveDatabase(data) {
   }
 }
 
-// Trigger Firestore initialization
+// Trigger Cloud Firestore initialization immediately
 initFirestore().catch(err => {
-  console.warn('[Firestore] Top-level init error:', err.message);
+  console.warn('[Cloud Firestore] Top-level init error:', err.message);
 });
 
 module.exports = {
   getDatabase,
   saveDatabase,
-  initDatabase,
+  pullFromFirestore,
+  pushToFirestore,
   uuidv4
 };
