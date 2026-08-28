@@ -5,13 +5,13 @@
       "partNumber": "6534",
       "name": "Hydraulic Pump",
       "category": "Hydraulics",
-      "stockQuantity": 0,
+      "stockQuantity": 50,
       "minAlertQuantity": 2,
       "unit": "Nos",
       "unitPrice": 25000,
       "locationRack": "Rack A-01",
       "description": "",
-      "updatedAt": "2026-08-27T10:13:22.492Z"
+      "updatedAt": "2026-08-27T10:50:28.383Z"
     }
   ],
   "technicians": [
@@ -83,7 +83,39 @@
       ]
     }
   ],
-  "dispatches": [],
+  "dispatches": [
+    {
+      "id": "dsp-2cf22462",
+      "dispatchCode": "DSP-2026-0001",
+      "clientName": "GVP FORWARDER PVT LTD.",
+      "siteAddress": "217, MAHINDRA CHEMBER, W.T.PATIL MARG, CHEMBUR, MUMBAI 400071",
+      "contactPerson": "",
+      "forkliftModel": "• • OM VOLTAS EVX30-HVT2100 3 TON\n• • TOYOTA BT RRE160E 1.6 TON\n• • TOYOTA BT RRE8 2.5 TON [ALL]",
+      "forkliftSerialNo": "",
+      "issueDescription": "• ✅ Battery / Gravity Check & Top-up\n• ✅ Pump Motor & Contactor Replacement\n• ❌ Controller Diagnostic & Error Reset",
+      "dispatchDate": "Outward: 2026-08-27 (10:00 AM)\nReturned: 2026-08-27 (03:59 PM)",
+      "dispatchTime": "10:00 AM",
+      "leadTechnician": "Datta Shinde",
+      "teamMembers": [],
+      "status": "COMPLETED",
+      "itemsIssued": [],
+      "notes": "",
+      "returnDate": null,
+      "returnTime": null,
+      "workSummary": "• ✅ Battery / Gravity Check & Top-up\n• ✅ Pump Motor & Contactor Replacement\n• ❌ Controller Diagnostic & Error Reset",
+      "verifiedBy": "Datta Shinde\n(Helpers: Malik wadkar, Faizal Mirza)",
+      "customerSignOff": false,
+      "customerRemarks": "",
+      "costBreakdown": {
+        "partsCost": "",
+        "travellingCost": "",
+        "otherCost": "",
+        "totalCost": ""
+      },
+      "createdAt": "2026-08-27T10:29:50.299Z",
+      "updatedAt": "2026-08-27T10:50:28.383Z"
+    }
+  ],
   "inventoryTransactions": [
     {
       "id": "tx-eba139a2",

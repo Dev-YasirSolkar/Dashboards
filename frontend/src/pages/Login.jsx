@@ -53,6 +53,10 @@ export default function Login() {
     if (code.includes('popup-closed-by-user')) {
       return 'Google sign-in popup cancel kar diya gaya.';
     }
+    if (code.includes('unauthorized-domain')) {
+      const currentDomain = typeof window !== 'undefined' ? window.location.hostname : '';
+      return `Domain (${currentDomain}) Firebase Console me Authorized nahi hai. Kripya Firebase Console -> Authentication -> Settings -> Authorized Domains me "${currentDomain}" add karein.`;
+    }
     return err?.message || 'Authentication error. Kripya dubara koshish karein.';
   };
 
