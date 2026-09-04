@@ -22,13 +22,15 @@ app.use((req, res, next) => {
 
 const { router: authRouter, requireApprovedUser } = require('./routes/auth');
 
-// Auto-sync Google Sheets on GET requests (crucial for Vercel Serverless environment)
-app.use(async (req, res, next) => {
+let lastSheetsSyncTime = 0;
+
+// Non-blocking background sync (max once per minute) for lightning fast response times (<15ms)
+app.use((req, res, next) => {
   if (req.method === 'GET' && req.path.startsWith('/api/') && !req.path.includes('/auth/')) {
-    try {
-      await autoSyncFromSheets(true);
-    } catch (e) {
-      console.warn('[Sheets Sync Middleware Warn]:', e.message);
+    const now = Date.now();
+    if (now - lastSheetsSyncTime > 60000) {
+      lastSheetsSyncTime = now;
+      autoSyncFromSheets(true).catch(e => console.warn('[Sheets Sync Warn]:', e.message));
     }
   }
   next();
@@ -43,6 +45,43 @@ app.use('/api/dispatches', requireApprovedUser, require('./routes/dispatches'));
 app.use('/api/technicians', requireApprovedUser, require('./routes/technicians'));
 app.use('/api/clients', requireApprovedUser, require('./routes/clients'));
 app.use('/api/reports', requireApprovedUser, require('./routes/reports'));
+
+function parsePartsFromSheetText(partsText) {
+  if (!partsText || partsText.includes('No parts issued')) return [];
+  const items = [];
+  const blocks = String(partsText).split('\n\n').map(b => b.trim()).filter(Boolean);
+  blocks.forEach(block => {
+    const lines = block.split('\n');
+    const headerLine = lines[0] || '';
+    let partName = headerLine.replace(/^\d+\.\s*/, '').trim();
+    let partNumber = 'N/A';
+    const match = headerLine.match(/(?:\d+\.\s*)?(.+?)\s*(?:\(([^)]+)\))?$/);
+    if (match) {
+      partName = (match[1] || partName).replace(/^\d+\.\s*/, '').trim();
+      if (match[2]) partNumber = match[2].trim();
+    }
+    let qtyIssued = 1;
+    let unit = 'Nos';
+    const statusLine = lines[1] || lines[0] || '';
+    const qtyMatch = statusLine.match(/Issued:\s*(\d+)\s*(\w+)?/i);
+    if (qtyMatch) {
+      qtyIssued = parseInt(qtyMatch[1]) || 1;
+      if (qtyMatch[2]) unit = qtyMatch[2].trim();
+    }
+    items.push({
+      partId: 'part-' + (partNumber !== 'N/A' ? partNumber : uuidv4().slice(0, 6)),
+      partNumber,
+      partName,
+      name: partName,
+      qtyIssued,
+      qtyUsed: 0,
+      qtyReturned: 0,
+      unit,
+      unitPrice: 0
+    });
+  });
+  return items;
+}
 
 // Background Auto-Sync Worker (Google Sheets ➔ App every 10 seconds)
 async function autoSyncFromSheets(force = false) {
@@ -123,7 +162,15 @@ async function autoSyncFromSheets(force = false) {
           leadTechnician: d.leadTechnician || 'Technician',
           teamMembers: existing?.teamMembers || [],
           status: d.status || existing?.status || 'COMPLETED',
-          itemsIssued: existing?.itemsIssued || [],
+          itemsIssued: (() => {
+            if (existing?.itemsIssued && existing.itemsIssued.length > 0) {
+              return existing.itemsIssued;
+            }
+            if (d.itemsIssuedRaw || d.itemsIssued) {
+              return parsePartsFromSheetText(d.itemsIssuedRaw || d.itemsIssued);
+            }
+            return [];
+          })(),
           notes: existing?.notes || '',
           returnDate: d.returnDate || existing?.returnDate || null,
           returnTime: existing?.returnTime || null,

@@ -109,16 +109,10 @@ router.post('/', async (req, res) => {
     });
   }
 
-  if (!itemsIssued || !Array.isArray(itemsIssued) || itemsIssued.length === 0) {
-    return res.status(400).json({
-      success: false,
-      message: 'Please select at least 1 spare part or item to dispatch for the site visit.'
-    });
-  }
-
-  // Verify stock availability for each item
+  // Verify stock availability for each item (if parts were issued)
+  const rawItems = Array.isArray(itemsIssued) ? itemsIssued : [];
   const validatedItems = [];
-  for (const item of itemsIssued) {
+  for (const item of rawItems) {
     const qty = Number(item.qtyIssued);
     if (isNaN(qty) || qty <= 0) {
       return res.status(400).json({
