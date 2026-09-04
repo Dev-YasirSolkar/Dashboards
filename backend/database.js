@@ -116,6 +116,7 @@ initFirestore().catch(err => {
 module.exports = {
   getDatabase,
   saveDatabase,
+  initDatabase: () => {},
   pullFromFirestore,
   pushToFirestore,
   uuidv4
