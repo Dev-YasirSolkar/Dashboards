@@ -63,7 +63,6 @@ async function pushToFirestore(data) {
 async function initFirestore() {
   try {
     const { initializeApp } = require('firebase/app');
-    const { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } = require('firebase/auth');
     const { getFirestore, doc: fDoc, getDoc: fGetDoc, setDoc: fSetDoc } = require('firebase/firestore');
 
     const firebaseConfig = {
@@ -76,29 +75,13 @@ async function initFirestore() {
     };
 
     const app = initializeApp(firebaseConfig);
-    auth = getAuth(app);
     firestore = getFirestore(app);
     doc = fDoc;
     getDoc = fGetDoc;
     setDoc = fSetDoc;
 
-    // Authenticate backend service account
-    const email = "system_backend@vithalenterprises.com";
-    const password = "SystemBackendPass123!";
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-    } catch (err) {
-      if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-email') {
-        try {
-          await createUserWithEmailAndPassword(auth, email, password);
-        } catch (cErr) {
-          console.warn('[Cloud Firestore Auth] User creation warn:', cErr.message);
-        }
-      }
-    }
-
     isFirestoreInitialized = true;
-    console.log('[Cloud Firestore] Connected & Authenticated successfully on project lucky-draw-7k8ft!');
+    console.log('[Cloud Firestore] Connected successfully on project lucky-draw-7k8ft!');
     await pullFromFirestore();
   } catch (err) {
     console.warn('[Cloud Firestore] Initialization warning:', err.message);

@@ -21,7 +21,17 @@ async function request(endpoint, options = {}) {
       headers
     });
 
-    const data = await response.json();
+    const text = await response.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      if (!response.ok) {
+        throw new Error(`Server Error (${response.status}): ${text.replace(/<[^>]*>/g, '').trim().slice(0, 150) || 'Server error occurred'}`);
+      }
+      throw new Error(`Invalid response format from server.`);
+    }
+
     if (!response.ok) {
       throw new Error(data.message || `Request failed with status ${response.status}`);
     }
