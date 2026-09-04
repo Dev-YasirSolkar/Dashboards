@@ -54,7 +54,7 @@ async function autoSyncFromSheets(force = false) {
     let modified = false;
 
     // 1. Sync Inventory
-    if (Array.isArray(sheetData.inventory)) {
+    if (Array.isArray(sheetData.inventory) && sheetData.inventory.length > 0) {
       db.inventory = sheetData.inventory.map(item => {
         const existing = (db.inventory || []).find(i => i.partNumber === item.partNumber);
         return {
@@ -75,7 +75,7 @@ async function autoSyncFromSheets(force = false) {
     }
 
     // 2. Sync Technicians
-    if (Array.isArray(sheetData.technicians)) {
+    if (Array.isArray(sheetData.technicians) && sheetData.technicians.length > 0) {
       db.technicians = sheetData.technicians.map(t => {
         const existing = (db.technicians || []).find(tech => tech.name.toLowerCase() === t.name.toLowerCase());
         return {
@@ -91,7 +91,7 @@ async function autoSyncFromSheets(force = false) {
     }
 
     // 3. Sync Clients
-    if (Array.isArray(sheetData.clients)) {
+    if (Array.isArray(sheetData.clients) && sheetData.clients.length > 0) {
       db.clients = sheetData.clients.map(c => {
         const existing = (db.clients || []).find(cli => cli.clientName.toLowerCase() === c.clientName.toLowerCase());
         return {
@@ -105,8 +105,8 @@ async function autoSyncFromSheets(force = false) {
       modified = true;
     }
 
-    // 4. Sync Dispatches (Handles row deletions in Google Sheets)
-    if (Array.isArray(sheetData.dispatches)) {
+    // 4. Sync Dispatches
+    if (Array.isArray(sheetData.dispatches) && sheetData.dispatches.length > 0) {
       db.dispatches = sheetData.dispatches.map(d => {
         const existing = (db.dispatches || []).find(disp => disp.dispatchCode === d.dispatchCode);
         return {
