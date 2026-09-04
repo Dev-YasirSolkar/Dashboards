@@ -22,6 +22,18 @@ app.use((req, res, next) => {
 
 const { router: authRouter, requireApprovedUser } = require('./routes/auth');
 
+// Auto-sync Google Sheets on GET requests (crucial for Vercel Serverless environment)
+app.use(async (req, res, next) => {
+  if (req.method === 'GET' && req.path.startsWith('/api/') && !req.path.includes('/auth/')) {
+    try {
+      await autoSyncFromSheets(true);
+    } catch (e) {
+      console.warn('[Sheets Sync Middleware Warn]:', e.message);
+    }
+  }
+  next();
+});
+
 // Public Auth Routes (Register, Login Sync, Status Check)
 app.use('/api/auth', authRouter);
 
@@ -33,9 +45,9 @@ app.use('/api/clients', requireApprovedUser, require('./routes/clients'));
 app.use('/api/reports', requireApprovedUser, require('./routes/reports'));
 
 // Background Auto-Sync Worker (Google Sheets ➔ App every 10 seconds)
-async function autoSyncFromSheets() {
+async function autoSyncFromSheets(force = false) {
   try {
-    const sheetData = await fetchAllDataFromGoogleSheets();
+    const sheetData = await fetchAllDataFromGoogleSheets(force);
     if (!sheetData) return;
 
     const db = getDatabase();
