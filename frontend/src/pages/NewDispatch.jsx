@@ -351,9 +351,18 @@ export default function NewDispatch({ setActiveTab, onDataRefresh }) {
 
       const res = await api.createDispatch(payload);
       if (res.success && res.data) {
-        setCreatedDispatch(res.data);
-        setSuccessMsg(res.message || `🚀 DISPATCH ${res.data.dispatchCode} CONFIRMED!`);
+        setSuccessMsg(`🚀 DISPATCH ${res.data.dispatchCode} CONFIRMED! Navigating to Active Site Trips...`);
         if (onDataRefresh) onDataRefresh();
+        
+        // Reset form fields
+        setSelectedTasks([]);
+        setIssuedParts([]);
+        setCustomAddedClauses([]);
+
+        setTimeout(() => {
+          setActiveTab('active');
+          setSuccessMsg(null);
+        }, 1100);
       } else {
         setError(res.message || 'Dispatch creation failed.');
       }

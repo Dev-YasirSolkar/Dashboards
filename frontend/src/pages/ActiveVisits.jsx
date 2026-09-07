@@ -33,9 +33,9 @@ export default function ActiveVisits({ setActiveTab, onDataRefresh }) {
   const [selectedDispatchForCard, setSelectedDispatchForCard] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
 
-  const fetchVisits = async () => {
+  const fetchVisits = async (showLoading = false) => {
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
       const res = await api.getDispatches();
       if (res.success) {
         const all = res.data || [];
@@ -53,14 +53,14 @@ export default function ActiveVisits({ setActiveTab, onDataRefresh }) {
     } catch (err) {
       console.error('Failed to load visits:', err);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchVisits();
+    fetchVisits(true);
     const interval = setInterval(() => {
-      fetchVisits();
+      fetchVisits(false);
     }, 4000);
     return () => clearInterval(interval);
   }, []);
