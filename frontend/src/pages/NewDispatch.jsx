@@ -335,7 +335,13 @@ export default function NewDispatch({ setActiveTab, onDataRefresh }) {
         isScheduled,
         status: isScheduled ? 'SCHEDULED' : 'DISPATCHED',
         itemsIssued: issuedParts.map(p => ({
-          partId: p.partId,
+          partId: p.partId || p.id,
+          partNumber: p.partNumber || 'N/A',
+          partName: p.partName || p.name || 'Spare Part',
+          name: p.partName || p.name || 'Spare Part',
+          category: p.category || 'General Spare Parts',
+          unit: p.unit || 'Nos',
+          unitPrice: Number(p.unitPrice) || 0,
           qtyIssued: Number(p.qtyIssued) || 1
         }))
       };

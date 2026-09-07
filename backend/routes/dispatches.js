@@ -121,26 +121,31 @@ router.post('/', async (req, res) => {
       });
     }
 
-    const inventoryItem = db.inventory.find(i => 
+    const inventoryItem = (db.inventory || []).find(i => 
       (item.partId && i.id === item.partId) || 
-      (item.partNumber && i.partNumber === item.partNumber) || 
-      (i.name && i.name === (item.partName || item.name))
+      (item.partNumber && item.partNumber !== 'N/A' && i.partNumber === item.partNumber) || 
+      (item.partName && i.name && i.name.toLowerCase() === (item.partName || item.name).toLowerCase()) ||
+      ((item.name || item.partName) && i.name && i.name.toLowerCase().includes((item.partName || item.name || '').toLowerCase()))
     );
+
+    const fallbackName = item.partName || item.name || (db.inventory && db.inventory[0] ? db.inventory[0].name : 'Spare Part');
+    const fallbackNumber = item.partNumber || (db.inventory && db.inventory[0] ? db.inventory[0].partNumber : 'N/A');
+
     if (!inventoryItem) {
-      // If still not found, create a fallback item representation
+      // If still not found, create a fallback item representation with provided name/number
       validatedItems.push({
         partId: item.partId || 'part-' + uuidv4().slice(0, 8),
-        partNumber: item.partNumber || 'N/A',
-        partName: item.partName || item.name || 'Spare Part',
+        partNumber: fallbackNumber,
+        partName: fallbackName,
         category: item.category || 'General Spare Parts',
         unit: item.unit || 'Nos',
         unitPrice: Number(item.unitPrice) || 0,
         qtyIssued: qty,
-        qtyUsed: 0,
-        qtyReturned: 0,
-        qtyDamaged: 0,
-        itemStatus: 'ISSUED',
-        installationNotes: ''
+        qtyUsed: item.qtyUsed || 0,
+        qtyReturned: item.qtyReturned || 0,
+        qtyDamaged: item.qtyDamaged || 0,
+        itemStatus: item.itemStatus || 'ISSUED',
+        installationNotes: item.installationNotes || ''
       });
       continue;
     }
@@ -154,17 +159,17 @@ router.post('/', async (req, res) => {
 
     validatedItems.push({
       partId: inventoryItem.id,
-      partNumber: inventoryItem.partNumber,
-      partName: inventoryItem.name,
-      category: inventoryItem.category,
-      unit: inventoryItem.unit,
-      unitPrice: inventoryItem.unitPrice,
+      partNumber: inventoryItem.partNumber || fallbackNumber,
+      partName: inventoryItem.name || fallbackName,
+      category: inventoryItem.category || item.category || 'General Spare Parts',
+      unit: inventoryItem.unit || item.unit || 'Nos',
+      unitPrice: inventoryItem.unitPrice !== undefined ? inventoryItem.unitPrice : (Number(item.unitPrice) || 0),
       qtyIssued: qty,
-      qtyUsed: 0,
-      qtyReturned: 0,
-      qtyDamaged: 0,
-      itemStatus: 'ISSUED',
-      installationNotes: ''
+      qtyUsed: item.qtyUsed || 0,
+      qtyReturned: item.qtyReturned || 0,
+      qtyDamaged: item.qtyDamaged || 0,
+      itemStatus: item.itemStatus || 'ISSUED',
+      installationNotes: item.installationNotes || ''
     });
   }
 
