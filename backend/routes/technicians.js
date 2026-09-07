@@ -4,8 +4,38 @@ const { getDatabase, saveDatabase, uuidv4 } = require('../database');
 const { syncTechniciansToGoogleSheets } = require('../googleSheets');
 
 // GET all technicians with dynamic live status calculation
-router.get('/', (req, res) => {
-  const db = getDatabase();
+router.get('/', async (req, res) => {
+  let db = getDatabase();
+
+  // Safeguard: If DB technicians is empty (e.g. cold start), pull from Firestore/Sheets synchronously
+  if (!db.technicians || db.technicians.length === 0) {
+    const { pullFromFirestore } = require('../database');
+    await pullFromFirestore();
+    db = getDatabase();
+    if (!db.technicians || db.technicians.length === 0) {
+      try {
+        const { fetchAllDataFromGoogleSheets } = require('../googleSheets');
+        const sheetData = await fetchAllDataFromGoogleSheets(true);
+        if (sheetData && Array.isArray(sheetData.technicians) && sheetData.technicians.length > 0) {
+          db.technicians = sheetData.technicians.map(t => {
+            const existing = (db.technicians || []).find(tech => tech.name.toLowerCase() === t.name.toLowerCase());
+            return {
+              id: existing?.id || 'tech-' + uuidv4().slice(0, 8),
+              name: t.name,
+              phone: t.phone || '',
+              designation: t.designation || 'Technician',
+              experience: t.experience || '1 Year',
+              status: t.status || 'Available'
+            };
+          });
+          saveDatabase(db);
+        }
+      } catch (err) {
+        console.warn('[Technicians GET auto-sync warn]:', err.message);
+      }
+    }
+  }
+
   const activeDispatches = (db.dispatches || []).filter(d => d.status === 'DISPATCHED');
   const scheduledDispatches = (db.dispatches || []).filter(d => d.status === 'SCHEDULED');
 

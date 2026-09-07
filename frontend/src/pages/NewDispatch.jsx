@@ -114,17 +114,15 @@ export default function NewDispatch({ setActiveTab, onDataRefresh }) {
         api.getInventory()
       ]);
 
-      if (cliRes.success && cliRes.data && cliRes.data.length > 0) {
+      if (cliRes.success && Array.isArray(cliRes.data) && cliRes.data.length > 0) {
         setClients(cliRes.data);
         if (!selectedClientId) {
           handleSelectClient(cliRes.data[0]);
         }
       }
-      if (techRes.success && techRes.data && techRes.data.length > 0) {
+      if (techRes.success && Array.isArray(techRes.data)) {
         setTechnicians(techRes.data);
-        if (selectedTechs.length === 0) {
-          setSelectedTechs([techRes.data[0].name]);
-        }
+        setSelectedTechs(prev => (prev.length === 0 && techRes.data.length > 0) ? [techRes.data[0].name] : prev);
       }
       if (invRes.success) {
         setInventory(invRes.data || []);
@@ -138,6 +136,15 @@ export default function NewDispatch({ setActiveTab, onDataRefresh }) {
 
   useEffect(() => {
     loadAllMasterData();
+    const interval = setInterval(() => {
+      api.getTechnicians().then(techRes => {
+        if (techRes.success && Array.isArray(techRes.data) && techRes.data.length > 0) {
+          setTechnicians(techRes.data);
+          setSelectedTechs(prev => (prev.length === 0 ? [techRes.data[0].name] : prev));
+        }
+      }).catch(() => {});
+    }, 4000);
+    return () => clearInterval(interval);
   }, []);
 
   const parseForkliftList = (rawForklifts) => {
@@ -714,7 +721,7 @@ export default function NewDispatch({ setActiveTab, onDataRefresh }) {
         <div className="flex items-center justify-between">
           <label className="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center space-x-1.5">
             <Users className="w-3.5 h-3.5 shrink-0" />
-            <span>3. SERVICE TEAM ({selectedTechs.length})</span>
+            <span>3. SERVICE TEAM ({selectedTechs.length} Selected • {technicians.length} Total)</span>
           </label>
           <button
             type="button"

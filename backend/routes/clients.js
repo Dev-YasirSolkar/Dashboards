@@ -4,8 +4,36 @@ const { getDatabase, saveDatabase, uuidv4 } = require('../database');
 const { syncClientsToGoogleSheets } = require('../googleSheets');
 
 // GET all clients
-router.get('/', (req, res) => {
-  const db = getDatabase();
+router.get('/', async (req, res) => {
+  let db = getDatabase();
+
+  if (!db.clients || db.clients.length === 0) {
+    const { pullFromFirestore } = require('../database');
+    await pullFromFirestore();
+    db = getDatabase();
+    if (!db.clients || db.clients.length === 0) {
+      try {
+        const { fetchAllDataFromGoogleSheets } = require('../googleSheets');
+        const sheetData = await fetchAllDataFromGoogleSheets(true);
+        if (sheetData && Array.isArray(sheetData.clients) && sheetData.clients.length > 0) {
+          db.clients = sheetData.clients.map(c => {
+            const existing = (db.clients || []).find(cli => cli.clientName.toLowerCase() === c.clientName.toLowerCase());
+            return {
+              id: existing?.id || 'cli-' + uuidv4().slice(0, 8),
+              clientName: c.clientName,
+              siteAddress: c.siteAddress,
+              contactPerson: c.contactPerson || '',
+              forklifts: Array.isArray(c.forklifts) ? c.forklifts : (c.forklifts ? c.forklifts.split(',').map(s => s.trim()) : [])
+            };
+          });
+          saveDatabase(db);
+        }
+      } catch (err) {
+        console.warn('[Clients GET auto-sync warn]:', err.message);
+      }
+    }
+  }
+
   res.json({ success: true, data: db.clients || [] });
 });
 
