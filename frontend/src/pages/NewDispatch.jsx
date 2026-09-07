@@ -31,6 +31,7 @@ import {
   Play
 } from 'lucide-react';
 import { api } from '../api';
+import ReconciliationModal from '../components/ReconciliationModal';
 
 // Predefined Work Categories & Clauses
 const WORK_CLAUSES = {
@@ -104,6 +105,8 @@ export default function NewDispatch({ setActiveTab, onDataRefresh }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
+  const [createdDispatch, setCreatedDispatch] = useState(null);
+  const [selectedDispatchForReconModal, setSelectedDispatchForReconModal] = useState(null);
 
   const loadAllMasterData = async () => {
     try {
@@ -347,12 +350,10 @@ export default function NewDispatch({ setActiveTab, onDataRefresh }) {
       };
 
       const res = await api.createDispatch(payload);
-      if (res.success) {
+      if (res.success && res.data) {
+        setCreatedDispatch(res.data);
         setSuccessMsg(res.message || `🚀 DISPATCH ${res.data.dispatchCode} CONFIRMED!`);
         if (onDataRefresh) onDataRefresh();
-        setTimeout(() => {
-          setActiveTab('active');
-        }, 800);
       } else {
         setError(res.message || 'Dispatch creation failed.');
       }
@@ -457,10 +458,35 @@ export default function NewDispatch({ setActiveTab, onDataRefresh }) {
         </div>
       )}
 
-      {successMsg && (
-        <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-black flex items-center space-x-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>{successMsg}</span>
+      {createdDispatch && (
+        <div className="p-4 sm:p-5 rounded-3xl bg-slate-900 border-2 border-emerald-500/60 shadow-2xl space-y-4 animate-fadeIn">
+          <div className="flex items-center space-x-3 text-emerald-400">
+            <CheckCircle2 className="w-8 h-8 shrink-0" />
+            <div>
+              <h3 className="text-base font-black text-white">🚀 Dispatch {createdDispatch.dispatchCode} Confirmed!</h3>
+              <p className="text-xs text-slate-300">Client: <strong>{createdDispatch.clientName}</strong> • Trip is now active on-site</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+            <button
+              type="button"
+              onClick={() => setSelectedDispatchForReconModal(createdDispatch)}
+              className="py-3 px-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black text-xs flex items-center justify-center space-x-2 shadow-lg shadow-emerald-500/30 hover:scale-[1.02] active:scale-95 transition-all border border-emerald-300"
+            >
+              <CheckCircle2 className="w-4 h-4 stroke-[3]" />
+              <span>✅ KAAM COMPLETE / RETURN ENTRY</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('active')}
+              className="py-3 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs flex items-center justify-center space-x-2 border border-slate-700 transition-all"
+            >
+              <Truck className="w-4 h-4 text-amber-400" />
+              <span>🚚 View Active Visits List</span>
+            </button>
+          </div>
         </div>
       )}
 
@@ -971,6 +997,19 @@ export default function NewDispatch({ setActiveTab, onDataRefresh }) {
             setShowAddPartModal(false);
             setInventory(prev => [newPart, ...prev]);
             handleAddPart(newPart);
+          }}
+        />
+      )}
+
+      {selectedDispatchForReconModal && (
+        <ReconciliationModal
+          dispatch={selectedDispatchForReconModal}
+          onClose={() => setSelectedDispatchForReconModal(null)}
+          onSuccess={(msg) => {
+            setSelectedDispatchForReconModal(null);
+            setCreatedDispatch(null);
+            if (onDataRefresh) onDataRefresh();
+            setActiveTab('active');
           }}
         />
       )}

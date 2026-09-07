@@ -59,6 +59,10 @@ export default function ActiveVisits({ setActiveTab, onDataRefresh }) {
 
   useEffect(() => {
     fetchVisits();
+    const interval = setInterval(() => {
+      fetchVisits();
+    }, 4000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleReconcileSuccess = (msg) => {
@@ -416,10 +420,10 @@ export default function ActiveVisits({ setActiveTab, onDataRefresh }) {
                     <button
                       type="button"
                       onClick={() => setSelectedDispatchForRecon(disp)}
-                      className="w-full sm:w-auto px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/20 active:scale-95 transition-all flex items-center justify-center space-x-2"
+                      className="w-full sm:w-auto px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/30 active:scale-95 transition-all flex items-center justify-center space-x-2 border border-emerald-300"
                     >
-                      <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
-                      <span>✅ Kaam Ho Gaya (Return Entry)</span>
+                      <CheckCircle2 className="w-4.5 h-4.5 stroke-[3]" />
+                      <span>✅ KAAM COMPLETE / RETURN ENTRY</span>
                     </button>
                   )}
                 </div>
