@@ -59,6 +59,9 @@ export default function ActiveVisits({ setActiveTab, onDataRefresh }) {
 
   useEffect(() => {
     fetchVisits(true);
+    const handleFocus = () => fetchVisits(false);
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
   }, []);
 
   const handleReconcileSuccess = (msg) => {

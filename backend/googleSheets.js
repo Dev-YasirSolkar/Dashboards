@@ -194,10 +194,9 @@ async function syncDispatchToGoogleSheets(dispatch) {
       siteAddress: dispatch.siteAddress,
       forkliftModel: (() => {
         const rawModel = String(dispatch.forkliftModel || 'Standard Forklift');
-        const models = rawModel.split(/,|\n/).map(s => s.trim()).filter(Boolean);
-        let formatted = models.length > 1 
-          ? models.map(m => `• ${m}`).join('\n')
-          : (models[0] || 'Standard Forklift');
+        const models = rawModel.split(/,|\n/).map(s => s.replace(/^[•\*\-\s]+/, '').trim()).filter(Boolean);
+        if (models.length === 0) return '• Standard Forklift';
+        let formatted = models.map(m => `• ${m}`).join('\n');
         if (dispatch.forkliftSerialNo) {
           formatted += `\n(S/N: ${dispatch.forkliftSerialNo})`;
         }
