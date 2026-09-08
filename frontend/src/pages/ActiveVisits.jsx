@@ -20,6 +20,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { api } from '../api';
+import { parseItemsIssued, normalizeStatus } from '../utils/itemsParser';
 import ReconciliationModal from '../components/ReconciliationModal';
 import JobCardModal from '../components/JobCardModal';
 
@@ -38,7 +39,11 @@ export default function ActiveVisits({ setActiveTab, onDataRefresh }) {
       if (showLoading) setLoading(true);
       const res = await api.getDispatches();
       if (res.success) {
-        const all = res.data || [];
+        const all = (res.data || []).map(d => ({
+          ...d,
+          status: normalizeStatus(d.status),
+          itemsIssued: parseItemsIssued(d.itemsIssued)
+        }));
         // Filter out completed ones, keep active and scheduled
         const uncompleted = all.filter(d => d.status === 'DISPATCHED' || d.status === 'SCHEDULED');
         setDispatches(uncompleted);
@@ -238,7 +243,8 @@ export default function ActiveVisits({ setActiveTab, onDataRefresh }) {
         <div className="grid grid-cols-1 gap-3.5">
           {filtered.map((disp) => {
             const isScheduled = disp.status === 'SCHEDULED';
-            const totalParts = (disp.itemsIssued || []).reduce((sum, i) => sum + (i.qtyIssued || 0), 0);
+            const items = parseItemsIssued(disp.itemsIssued);
+            const totalParts = items.reduce((sum, i) => sum + (i.qtyIssued || 0), 0);
 
             // Clean date & time strings
             const cleanDateStr = String(disp.dispatchDate || '')
@@ -366,11 +372,11 @@ export default function ActiveVisits({ setActiveTab, onDataRefresh }) {
                 {/* Issued Parts Badges */}
                 <div className="space-y-1.5 pt-1">
                   <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                    <span>📦 Parts Issued ({disp.itemsIssued?.length || 0} items):</span>
+                    <span>📦 Parts Issued ({items.length} items):</span>
                     <span className="text-amber-400 font-black">{totalParts} Total Qty</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {(disp.itemsIssued || []).map((item, idx) => (
+                    {items.map((item, idx) => (
                       <span 
                         key={idx}
                         className="text-xs font-semibold bg-slate-800/90 text-slate-200 px-2.5 py-1.5 rounded-xl border border-slate-700/80 flex items-center space-x-1"

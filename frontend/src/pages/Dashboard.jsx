@@ -25,6 +25,7 @@ import {
   UserCheck
 } from 'lucide-react';
 import { api } from '../api';
+import { parseItemsIssued } from '../utils/itemsParser';
 import { useAuth } from '../context/AuthContext';
 import ReconciliationModal from '../components/ReconciliationModal';
 import JobCardModal from '../components/JobCardModal';
@@ -365,7 +366,8 @@ export default function Dashboard({ setActiveTab, onDataRefresh }) {
           ) : (
             <div className="space-y-3">
               {activeDispatches.map((disp) => {
-                const totalParts = disp.itemsIssued ? disp.itemsIssued.reduce((s, i) => s + (i.qtyIssued || 0), 0) : 0;
+                const items = parseItemsIssued(disp.itemsIssued);
+                const totalParts = items.reduce((s, i) => s + (i.qtyIssued || 0), 0);
                 return (
                   <div
                     key={disp.id}
@@ -405,7 +407,7 @@ export default function Dashboard({ setActiveTab, onDataRefresh }) {
                       </div>
                       <div className="col-span-2 sm:col-span-1">
                         <span className="text-[9px] uppercase font-bold text-slate-500 block">Parts Carried</span>
-                        <strong className="text-blue-400 text-xs">{disp.itemsIssued?.length || 0} Parts ({totalParts} Qty)</strong>
+                        <strong className="text-blue-400 text-xs">{items.length} Parts ({totalParts} Qty)</strong>
                       </div>
                     </div>
 

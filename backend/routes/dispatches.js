@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { getDatabase, saveDatabase, uuidv4 } = require('../database');
+const { getDatabase, saveDatabase, pullFromFirestore, uuidv4 } = require('../database');
 const { syncDispatchToGoogleSheets, syncInventoryToGoogleSheets } = require('../googleSheets');
+const { parseItemsIssued, normalizeStatus } = require('../utils/itemsParser');
 
 // Helper to generate readable Dispatch Number e.g. DSP-2026-001
 function generateDispatchCode(db) {
@@ -11,14 +12,26 @@ function generateDispatchCode(db) {
 }
 
 // GET all dispatches with filtering
-router.get('/', (req, res) => {
-  const db = getDatabase();
+router.get('/', async (req, res) => {
+  let db = getDatabase();
+
+  // Cold start fallback: pull from Firestore if memory cache is empty
+  if (!db.dispatches || db.dispatches.length === 0) {
+    await pullFromFirestore();
+    db = getDatabase();
+  }
+
   const { status, employee, client, startDate, endDate, search } = req.query;
 
-  let list = db.dispatches || [];
+  let list = (db.dispatches || []).map(d => ({
+    ...d,
+    status: normalizeStatus(d.status),
+    itemsIssued: parseItemsIssued(d.itemsIssued)
+  }));
 
   if (status && status !== 'ALL') {
-    list = list.filter(d => d.status === status);
+    const normStatus = normalizeStatus(status);
+    list = list.filter(d => d.status === normStatus);
   }
 
   if (employee && employee !== 'ALL') {
@@ -48,7 +61,10 @@ router.get('/', (req, res) => {
       d.siteAddress.toLowerCase().includes(s) ||
       d.forkliftModel.toLowerCase().includes(s) ||
       d.leadTechnician.toLowerCase().includes(s) ||
-      (d.itemsIssued && d.itemsIssued.some(item => item.partName.toLowerCase().includes(s) || item.partNumber.toLowerCase().includes(s)))
+      (d.itemsIssued && d.itemsIssued.some(item => 
+        (item.partName || '').toLowerCase().includes(s) || 
+        (item.partNumber || '').toLowerCase().includes(s)
+      ))
     );
   }
 
@@ -56,9 +72,15 @@ router.get('/', (req, res) => {
   list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   // Compute summary stats
-  const total = (db.dispatches || []).length;
-  const activeCount = (db.dispatches || []).filter(d => d.status === 'DISPATCHED').length;
-  const completedCount = (db.dispatches || []).filter(d => d.status === 'COMPLETED').length;
+  const allNormalized = (db.dispatches || []).map(d => ({
+    ...d,
+    status: normalizeStatus(d.status),
+    itemsIssued: parseItemsIssued(d.itemsIssued)
+  }));
+
+  const total = allNormalized.length;
+  const activeCount = allNormalized.filter(d => d.status === 'DISPATCHED').length;
+  const completedCount = allNormalized.filter(d => d.status === 'COMPLETED').length;
 
   res.json({
     success: true,
@@ -74,11 +96,17 @@ router.get('/', (req, res) => {
 // GET single dispatch by ID
 router.get('/:id', (req, res) => {
   const db = getDatabase();
-  const dispatch = (db.dispatches || []).find(d => d.id === req.params.id || d.dispatchCode === req.params.id);
+  const raw = (db.dispatches || []).find(d => d.id === req.params.id || d.dispatchCode === req.params.id);
 
-  if (!dispatch) {
+  if (!raw) {
     return res.status(404).json({ success: false, message: 'Dispatch record not found' });
   }
+
+  const dispatch = {
+    ...raw,
+    status: normalizeStatus(raw.status),
+    itemsIssued: parseItemsIssued(raw.itemsIssued)
+  };
 
   res.json({ success: true, data: dispatch });
 });
@@ -331,7 +359,8 @@ router.post('/:id/reconcile', async (req, res) => {
   const updatedItems = [];
   const stockToRestock = [];
 
-  for (const origItem of (dispatch.itemsIssued || [])) {
+  const origItemsList = parseItemsIssued(dispatch.itemsIssued);
+  for (const origItem of origItemsList) {
     const reconItem = itemsReconciliation.find(r => r.partId === origItem.partId || r.partNumber === origItem.partNumber) || {};
     const qtyUsed = Number(reconItem.qtyUsed) || 0;
     const qtyReturned = Number(reconItem.qtyReturned) || 0;

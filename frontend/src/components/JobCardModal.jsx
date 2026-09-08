@@ -15,12 +15,15 @@ import {
   Loader2
 } from 'lucide-react';
 import html2canvas from 'html2canvas';
+import { parseItemsIssued } from '../utils/itemsParser';
 
 export default function JobCardModal({ dispatch, onClose }) {
   const [downloadingImage, setDownloadingImage] = useState(false);
   const cardRef = useRef(null);
 
   if (!dispatch) return null;
+
+  const items = parseItemsIssued(dispatch.itemsIssued);
 
   // Mobile & browser back button support
   useEffect(() => {
@@ -357,7 +360,7 @@ export default function JobCardModal({ dispatch, onClose }) {
                   PARTS CONSUMPTION & RETURN RECONCILIATION
                 </span>
                 <span className="text-[10px] font-bold text-slate-500">
-                  Total Items: {dispatch.itemsIssued?.length || 0}
+                  Total Items: {items.length}
                 </span>
               </div>
 
@@ -373,8 +376,8 @@ export default function JobCardModal({ dispatch, onClose }) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 text-[11px]">
-                  {(dispatch.itemsIssued && dispatch.itemsIssued.length > 0) ? (
-                    dispatch.itemsIssued.map((item, idx) => (
+                  {items.length > 0 ? (
+                    items.map((item, idx) => (
                       <tr key={idx} className="hover:bg-slate-50/80">
                         <td className="p-2 border-r border-slate-200 text-center font-mono text-slate-500">
                           {idx + 1}

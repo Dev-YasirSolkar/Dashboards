@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const { initDatabase, getDatabase, saveDatabase, uuidv4 } = require('./database');
 const { fetchAllDataFromGoogleSheets } = require('./googleSheets');
+const { parseItemsIssued, normalizeStatus } = require('./utils/itemsParser');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -147,15 +148,11 @@ async function autoSyncFromSheets(force = false) {
           dispatchTime: d.dispatchTime || existing?.dispatchTime || '10:00 AM',
           leadTechnician: d.leadTechnician || 'Technician',
           teamMembers: existing?.teamMembers || [],
-          status: d.status || existing?.status || 'COMPLETED',
+          status: normalizeStatus(d.status || existing?.status || 'COMPLETED'),
           itemsIssued: (() => {
-            if (existing?.itemsIssued && existing.itemsIssued.length > 0) {
-              return existing.itemsIssued;
-            }
-            if (d.itemsIssuedRaw || d.itemsIssued) {
-              return parsePartsFromSheetText(d.itemsIssuedRaw || d.itemsIssued);
-            }
-            return [];
+            const parsed = parseItemsIssued(d.itemsIssuedRaw || d.itemsIssued || existing?.itemsIssued);
+            if (parsed.length > 0) return parsed;
+            return parseItemsIssued(existing?.itemsIssued);
           })(),
           notes: existing?.notes || '',
           returnDate: d.returnDate || existing?.returnDate || null,

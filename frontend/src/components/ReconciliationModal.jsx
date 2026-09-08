@@ -18,6 +18,7 @@ import {
   ReceiptText
 } from 'lucide-react';
 import { api } from '../api';
+import { parseItemsIssued } from '../utils/itemsParser';
 
 export default function ReconciliationModal({ dispatch, onClose, onSuccess }) {
   const [returnDate] = useState(() => new Date().toISOString().split('T')[0]);
@@ -66,10 +67,11 @@ export default function ReconciliationModal({ dispatch, onClose, onSuccess }) {
 
   useEffect(() => {
     const rawParts = (dispatch && (dispatch.itemsIssued || dispatch.items || dispatch.issuedParts)) || [];
-    if (Array.isArray(rawParts) && rawParts.length > 0) {
+    const parsed = parseItemsIssued(rawParts);
+    if (parsed.length > 0) {
       setItemsState(
-        rawParts.map((item) => ({
-          partId: item.partId || item.id || 'part-' + Math.random().toString(36).substring(2, 7),
+        parsed.map((item) => ({
+          partId: item.partId || 'part-' + Math.random().toString(36).substring(2, 7),
           partNumber: item.partNumber || 'N/A',
           partName: item.partName || item.name || 'Spare Part',
           unit: item.unit || 'Nos',
