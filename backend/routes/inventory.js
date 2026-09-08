@@ -4,8 +4,15 @@ const { getDatabase, saveDatabase, uuidv4 } = require('../database');
 const { syncInventoryToGoogleSheets } = require('../googleSheets');
 
 // GET all inventory items
-router.get('/', (req, res) => {
-  const db = getDatabase();
+router.get('/', async (req, res) => {
+  let db = getDatabase();
+
+  if (!db.inventory || db.inventory.length === 0) {
+    const { pullFromFirestore } = require('../database');
+    await pullFromFirestore();
+    db = getDatabase();
+  }
+
   const search = (req.query.search || '').toLowerCase();
   const category = req.query.category || '';
 

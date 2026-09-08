@@ -331,8 +331,8 @@ router.post('/:id/reconcile', async (req, res) => {
   const updatedItems = [];
   const stockToRestock = [];
 
-  for (const origItem of dispatch.itemsIssued) {
-    const reconItem = itemsReconciliation.find(r => r.partId === origItem.partId) || {};
+  for (const origItem of (dispatch.itemsIssued || [])) {
+    const reconItem = itemsReconciliation.find(r => r.partId === origItem.partId || r.partNumber === origItem.partNumber) || {};
     const qtyUsed = Number(reconItem.qtyUsed) || 0;
     const qtyReturned = Number(reconItem.qtyReturned) || 0;
     const qtyDamaged = Number(reconItem.qtyDamaged) || 0;
@@ -449,7 +449,7 @@ router.delete('/:id', async (req, res) => {
   const dispatch = db.dispatches[dispatchIndex];
 
   if (dispatch.status === 'DISPATCHED') {
-    for (const item of dispatch.itemsIssued) {
+    for (const item of (dispatch.itemsIssued || [])) {
       const invIndex = db.inventory.findIndex(i => i.id === item.partId);
       if (invIndex !== -1) {
         db.inventory[invIndex].stockQuantity += item.qtyIssued;
