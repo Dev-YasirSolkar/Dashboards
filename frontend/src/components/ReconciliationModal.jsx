@@ -65,21 +65,24 @@ export default function ReconciliationModal({ dispatch, onClose, onSuccess }) {
   const [itemsState, setItemsState] = useState([]);
 
   useEffect(() => {
-    if (dispatch && dispatch.itemsIssued) {
+    const rawParts = (dispatch && (dispatch.itemsIssued || dispatch.items || dispatch.issuedParts)) || [];
+    if (Array.isArray(rawParts) && rawParts.length > 0) {
       setItemsState(
-        dispatch.itemsIssued.map((item) => ({
-          partId: item.partId,
-          partNumber: item.partNumber,
-          partName: item.partName,
-          unit: item.unit,
-          unitPrice: item.unitPrice || 0, // ← carry unit price for auto cost calculation
-          qtyIssued: item.qtyIssued,
-          qtyUsed: item.qtyIssued,
-          qtyReturned: 0,
-          qtyDamaged: 0,
-          installationNotes: ''
+        rawParts.map((item) => ({
+          partId: item.partId || item.id || 'part-' + Math.random().toString(36).substring(2, 7),
+          partNumber: item.partNumber || 'N/A',
+          partName: item.partName || item.name || 'Spare Part',
+          unit: item.unit || 'Nos',
+          unitPrice: Number(item.unitPrice) || 0,
+          qtyIssued: Number(item.qtyIssued) || 1,
+          qtyUsed: item.qtyUsed !== undefined ? Number(item.qtyUsed) : Number(item.qtyIssued || 1),
+          qtyReturned: Number(item.qtyReturned) || 0,
+          qtyDamaged: Number(item.qtyDamaged) || 0,
+          installationNotes: item.installationNotes || ''
         }))
       );
+    } else {
+      setItemsState([]);
     }
   }, [dispatch]);
 
@@ -425,16 +428,29 @@ export default function ReconciliationModal({ dispatch, onClose, onSuccess }) {
               </div>
             </div>
 
-            {itemsState.map((item) => (
-              <div key={item.partId} className="p-3.5 rounded-2xl bg-slate-800/50 border border-slate-700 space-y-2.5 shadow-md">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <strong className="text-white text-sm block font-bold">{item.partName}</strong>
-                    <span className="text-[11px] font-mono text-slate-400">
-                      {item.partNumber} • Carried: <strong className="text-amber-400">{item.qtyIssued} {item.unit}</strong>
-                      {item.unitPrice > 0 && <span className="text-slate-500"> • {fmt(item.unitPrice)}/unit</span>}
-                    </span>
-                  </div>
+            {itemsState.length === 0 ? (
+              <div className="p-4 bg-slate-950/70 rounded-2xl border border-slate-800 text-center space-y-1.5">
+                <div className="w-8 h-8 rounded-xl bg-slate-800/80 text-amber-400 flex items-center justify-center mx-auto">
+                  <Package className="w-4 h-4" />
+                </div>
+                <p className="text-xs text-slate-300 font-bold">
+                  Is trip par godown se koi spare part issue nahi hua tha (Service Only Visit).
+                </p>
+                <p className="text-[11px] text-slate-500">
+                  Parts cost ₹0 auto-applied. Extra charges neeche Section 4 me add kar sakte hain.
+                </p>
+              </div>
+            ) : (
+              itemsState.map((item) => (
+                <div key={item.partId} className="p-3.5 rounded-2xl bg-slate-800/50 border border-slate-700 space-y-2.5 shadow-md">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <strong className="text-white text-sm block font-bold">{item.partName || item.name || 'Spare Part'}</strong>
+                      <span className="text-[11px] font-mono text-slate-400">
+                        {item.partNumber || 'N/A'} • Carried: <strong className="text-amber-400">{item.qtyIssued} {item.unit || 'Nos'}</strong>
+                        {item.unitPrice > 0 && <span className="text-slate-500"> • {fmt(item.unitPrice)}/unit</span>}
+                      </span>
+                    </div>
                   <span className={`text-[11px] font-bold px-2.5 py-1 rounded-xl whitespace-nowrap ${
                     item.qtyUsed === item.qtyIssued ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                     : item.qtyReturned === item.qtyIssued ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
@@ -489,7 +505,7 @@ export default function ReconciliationModal({ dispatch, onClose, onSuccess }) {
                   </div>
                 )}
               </div>
-            ))}
+            )))}
           </div>
 
           {/* ─── SECTION 4: TRIP COST ENTRY ─── */}
