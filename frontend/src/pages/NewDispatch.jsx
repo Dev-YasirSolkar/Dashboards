@@ -829,7 +829,7 @@ export default function NewDispatch({ setActiveTab, onDataRefresh }) {
         <div className="flex items-center justify-between">
           <label className="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center space-x-1.5">
             <Package className="w-3.5 h-3.5 shrink-0" />
-            <span>4. PARTS ({issuedParts.length} ITEMS • {totalPartsQty} QTY)</span>
+            <span>4. SPARE PARTS TO ISSUE ({issuedParts.length} Selected • {inventory.length} Available in Godown)</span>
           </label>
 
           <button

@@ -11,6 +11,30 @@ router.get('/', async (req, res) => {
     const { pullFromFirestore } = require('../database');
     await pullFromFirestore();
     db = getDatabase();
+    if (!db.inventory || db.inventory.length === 0) {
+      try {
+        const { fetchAllDataFromGoogleSheets } = require('../googleSheets');
+        const sheetData = await fetchAllDataFromGoogleSheets(true);
+        if (sheetData && Array.isArray(sheetData.inventory) && sheetData.inventory.length > 0) {
+          db.inventory = sheetData.inventory.map(item => ({
+            id: 'part-' + uuidv4().slice(0, 8),
+            partNumber: item.partNumber,
+            name: item.name,
+            category: item.category || 'General Spare Parts',
+            stockQuantity: Number(item.stockQuantity) || 0,
+            minAlertQuantity: 2,
+            unit: item.unit || 'Nos',
+            unitPrice: Number(item.unitPrice) || 0,
+            locationRack: item.locationRack || 'Warehouse Rack',
+            description: '',
+            updatedAt: new Date().toISOString()
+          }));
+          saveDatabase(db);
+        }
+      } catch (err) {
+        console.warn('[Inventory GET auto-sync warn]:', err.message);
+      }
+    }
   }
 
   const search = (req.query.search || '').toLowerCase();
