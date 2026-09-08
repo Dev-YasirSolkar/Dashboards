@@ -22,20 +22,6 @@ app.use((req, res, next) => {
 
 const { router: authRouter, requireApprovedUser } = require('./routes/auth');
 
-let lastSheetsSyncTime = 0;
-
-// Non-blocking background sync (every 10s) for fast live Google Sheets updates
-app.use((req, res, next) => {
-  if (req.method === 'GET' && req.path.startsWith('/api/') && !req.path.includes('/auth/')) {
-    const now = Date.now();
-    if (now - lastSheetsSyncTime > 10000) {
-      lastSheetsSyncTime = now;
-      autoSyncFromSheets(true).catch(e => console.warn('[Sheets Sync Warn]:', e.message));
-    }
-  }
-  next();
-});
-
 // Public Auth Routes (Register, Login Sync, Status Check)
 app.use('/api/auth', authRouter);
 

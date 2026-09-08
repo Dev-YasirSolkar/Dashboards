@@ -47,15 +47,6 @@ export default function TechniciansClients() {
 
   useEffect(() => {
     loadData();
-    const interval = setInterval(() => {
-      Promise.all([api.getTechnicians(), api.getClients()])
-        .then(([techRes, cliRes]) => {
-          if (techRes.success) setTechnicians(techRes.data || []);
-          if (cliRes.success) setClients(cliRes.data || []);
-        })
-        .catch(() => {});
-    }, 5000);
-    return () => clearInterval(interval);
   }, []);
 
   const showToast = (msg) => {

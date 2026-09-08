@@ -139,15 +139,6 @@ export default function NewDispatch({ setActiveTab, onDataRefresh }) {
 
   useEffect(() => {
     loadAllMasterData();
-    const interval = setInterval(() => {
-      api.getTechnicians().then(techRes => {
-        if (techRes.success && Array.isArray(techRes.data) && techRes.data.length > 0) {
-          setTechnicians(techRes.data);
-          setSelectedTechs(prev => (prev.length === 0 ? [techRes.data[0].name] : prev));
-        }
-      }).catch(() => {});
-    }, 4000);
-    return () => clearInterval(interval);
   }, []);
 
   const parseForkliftList = (rawForklifts) => {

@@ -59,17 +59,6 @@ export default function Inventory({ onDataRefresh }) {
 
   useEffect(() => {
     fetchInventory();
-    const interval = setInterval(() => {
-      api.getInventory({ category: selectedCategory, search })
-        .then(res => {
-          if (res.success) {
-            setInventory(res.data || []);
-            setStats(res.stats || {});
-          }
-        })
-        .catch(() => {});
-    }, 5000);
-    return () => clearInterval(interval);
   }, [selectedCategory, search]);
 
   const showToast = (msg) => {

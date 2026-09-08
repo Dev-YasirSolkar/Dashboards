@@ -59,10 +59,6 @@ export default function ActiveVisits({ setActiveTab, onDataRefresh }) {
 
   useEffect(() => {
     fetchVisits(true);
-    const interval = setInterval(() => {
-      fetchVisits(false);
-    }, 4000);
-    return () => clearInterval(interval);
   }, []);
 
   const handleReconcileSuccess = (msg) => {

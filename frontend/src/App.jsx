@@ -77,10 +77,6 @@ function MainApp() {
   useEffect(() => {
     if (currentUser && userStatus === 'APPROVED') {
       fetchSummaryBadges(false);
-      const interval = setInterval(() => {
-        fetchSummaryBadges(false);
-      }, 8000);
-      return () => clearInterval(interval);
     }
   }, [currentUser, userStatus]);
 
