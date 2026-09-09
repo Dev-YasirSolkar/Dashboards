@@ -72,18 +72,30 @@ export default function ReconciliationModal({ dispatch, onClose, onSuccess }) {
     const parsed = parseItemsIssued(rawParts);
     if (parsed.length > 0) {
       setItemsState(
-        parsed.map((item) => ({
-          partId: item.partId || 'part-' + Math.random().toString(36).substring(2, 7),
-          partNumber: item.partNumber || 'N/A',
-          partName: item.partName || item.name || 'Spare Part',
-          unit: item.unit || 'Nos',
-          unitPrice: Number(item.unitPrice) || 0,
-          qtyIssued: Number(item.qtyIssued) || 1,
-          qtyUsed: item.qtyUsed !== undefined ? Number(item.qtyUsed) : Number(item.qtyIssued || 1),
-          qtyReturned: Number(item.qtyReturned) || 0,
-          qtyDamaged: Number(item.qtyDamaged) || 0,
-          installationNotes: item.installationNotes || ''
-        }))
+        parsed.map((item) => {
+          const issued = Number(item.qtyIssued) || 1;
+          // Default to 100% USED (qtyUsed = qtyIssued, qtyReturned = 0) unless explicit non-zero used/returned was previously saved
+          let used = issued;
+          let returned = 0;
+          
+          if (item.qtyUsed !== undefined && item.qtyReturned !== undefined && (Number(item.qtyUsed) > 0 || Number(item.qtyReturned) > 0)) {
+            used = Number(item.qtyUsed);
+            returned = Number(item.qtyReturned);
+          }
+
+          return {
+            partId: item.partId || 'part-' + Math.random().toString(36).substring(2, 7),
+            partNumber: item.partNumber || 'N/A',
+            partName: item.partName || item.name || 'Spare Part',
+            unit: item.unit || 'Nos',
+            unitPrice: Number(item.unitPrice) || 0,
+            qtyIssued: issued,
+            qtyUsed: Math.min(issued, Math.max(0, used)),
+            qtyReturned: Math.min(issued, Math.max(0, returned)),
+            qtyDamaged: Number(item.qtyDamaged) || 0,
+            installationNotes: item.installationNotes || ''
+          };
+        })
       );
     } else {
       setItemsState([]);
