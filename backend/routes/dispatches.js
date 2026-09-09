@@ -4,11 +4,40 @@ const { getDatabase, saveDatabase, pullFromFirestore, uuidv4 } = require('../dat
 const { syncDispatchToGoogleSheets, syncInventoryToGoogleSheets } = require('../googleSheets');
 const { parseItemsIssued, normalizeStatus } = require('../utils/itemsParser');
 
-// Helper to generate readable Dispatch Number e.g. DSP-2026-001
+// Helper to generate unique, collision-proof Dispatch Number e.g. DSP-2026-0001
 function generateDispatchCode(db) {
   const year = new Date().getFullYear();
-  const count = (db.dispatches || []).length + 1;
-  return `DSP-${year}-${String(count).padStart(4, '0')}`;
+  const prefix = `DSP-${year}-`;
+  
+  let maxNum = 0;
+  const list = db.dispatches || [];
+  const existingCodes = new Set();
+  
+  for (const d of list) {
+    if (d && d.dispatchCode) {
+      const code = String(d.dispatchCode).trim().toUpperCase();
+      existingCodes.add(code);
+      
+      // Extract numbers from code candidate
+      const matches = code.match(/(\d+)/g);
+      if (matches && matches.length > 0) {
+        const num = parseInt(matches[matches.length - 1], 10);
+        if (!isNaN(num) && num > maxNum) {
+          maxNum = num;
+        }
+      }
+    }
+  }
+
+  let nextNum = maxNum + 1;
+  let codeCandidate = `${prefix}${String(nextNum).padStart(4, '0')}`;
+  
+  while (existingCodes.has(codeCandidate)) {
+    nextNum++;
+    codeCandidate = `${prefix}${String(nextNum).padStart(4, '0')}`;
+  }
+
+  return codeCandidate;
 }
 
 // GET all dispatches with filtering
