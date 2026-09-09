@@ -15,14 +15,16 @@ import {
   IndianRupee,
   Car,
   Wrench,
-  ReceiptText
+  ReceiptText,
+  Calendar,
+  Clock
 } from 'lucide-react';
 import { api } from '../api';
 import { parseItemsIssued } from '../utils/itemsParser';
 
 export default function ReconciliationModal({ dispatch, onClose, onSuccess }) {
-  const [returnDate] = useState(() => new Date().toISOString().split('T')[0]);
-  const [returnTime] = useState(() => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+  const [returnDate, setReturnDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [returnTime, setReturnTime] = useState(() => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
 
   // Extract all assigned tasks from the dispatch record (excluding status notices)
   const assignedTasksList = useMemo(() => {
@@ -312,6 +314,42 @@ export default function ReconciliationModal({ dispatch, onClose, onSuccess }) {
               {error}
             </div>
           )}
+
+          {/* ─── SECTION 0: COMPLETION DATE & TIME PICKER ─── */}
+          <div className="p-3.5 bg-slate-950/80 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div className="flex items-center space-x-2.5">
+              <div className="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center shrink-0">
+                <Calendar className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-xs font-black uppercase tracking-wider text-white block">Completion Date & Time</span>
+                <span className="text-[11px] text-slate-400">Kaam khatam / Return entry ki taarik aur samay select karein:</span>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2 shrink-0">
+              <div className="flex items-center space-x-1.5 bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 focus-within:border-amber-400">
+                <Calendar className="w-3.5 h-3.5 text-amber-400" />
+                <input
+                  type="date"
+                  value={returnDate}
+                  onChange={(e) => setReturnDate(e.target.value)}
+                  className="bg-transparent text-xs font-bold text-white focus:outline-none cursor-pointer"
+                />
+              </div>
+
+              <div className="flex items-center space-x-1.5 bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 focus-within:border-amber-400">
+                <Clock className="w-3.5 h-3.5 text-amber-400" />
+                <input
+                  type="text"
+                  placeholder="e.g. 05:30 PM"
+                  value={returnTime}
+                  onChange={(e) => setReturnTime(e.target.value)}
+                  className="bg-transparent text-xs font-bold text-white focus:outline-none w-20 text-center"
+                />
+              </div>
+            </div>
+          </div>
 
           {/* ─── SECTION 1: ASSIGNED WORK STATUS ─── */}
           <div className="p-3.5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
