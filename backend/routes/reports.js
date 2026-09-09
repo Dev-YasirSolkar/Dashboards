@@ -1,55 +1,31 @@
 const express = require('express');
 const router = express.Router();
-const { getDatabase, saveDatabase, uuidv4 } = require('../database');
+const { getDatabase, saveDatabase, pullFromFirestore, uuidv4 } = require('../database');
 const { fetchAllDataFromGoogleSheets } = require('../googleSheets');
-
-function parsePartsFromSheetText(partsText) {
-  if (!partsText || partsText.includes('No parts issued')) return [];
-  const items = [];
-  const blocks = String(partsText).split('\n\n').map(b => b.trim()).filter(Boolean);
-  blocks.forEach(block => {
-    const lines = block.split('\n');
-    const headerLine = lines[0] || '';
-    let partName = headerLine.replace(/^\d+\.\s*/, '').trim();
-    let partNumber = 'N/A';
-    const match = headerLine.match(/(?:\d+\.\s*)?(.+?)\s*(?:\(([^)]+)\))?$/);
-    if (match) {
-      partName = (match[1] || partName).replace(/^\d+\.\s*/, '').trim();
-      if (match[2]) partNumber = match[2].trim();
-    }
-    let qtyIssued = 1;
-    let unit = 'Nos';
-    const statusLine = lines[1] || lines[0] || '';
-    const qtyMatch = statusLine.match(/Issued:\s*(\d+)\s*(\w+)?/i);
-    if (qtyMatch) {
-      qtyIssued = parseInt(qtyMatch[1]) || 1;
-      if (qtyMatch[2]) unit = qtyMatch[2].trim();
-    }
-    items.push({
-      partId: 'part-' + (partNumber !== 'N/A' ? partNumber : uuidv4().slice(0, 6)),
-      partNumber,
-      partName,
-      name: partName,
-      qtyIssued,
-      qtyUsed: 0,
-      qtyReturned: 0,
-      unit,
-      unitPrice: 0
-    });
-  });
-  return items;
-}
+const { parseItemsIssued, normalizeStatus } = require('../utils/itemsParser');
 
 // GET Dashboard Metrics & Statistics
-router.get('/dashboard', (req, res) => {
-  const db = getDatabase();
+router.get('/dashboard', async (req, res) => {
+  let db = getDatabase();
+
+  // Cold start fallback: pull from Firestore if memory cache is empty
+  if (!db.dispatches || db.dispatches.length === 0 || !db.inventory || db.inventory.length === 0) {
+    await pullFromFirestore();
+    db = getDatabase();
+  }
 
   const inventory = db.inventory || [];
-  const dispatches = db.dispatches || [];
+  const rawDispatches = db.dispatches || [];
   const technicians = db.technicians || [];
 
+  const dispatches = rawDispatches.map(d => ({
+    ...d,
+    status: normalizeStatus(d.status),
+    itemsIssued: parseItemsIssued(d.itemsIssued)
+  }));
+
   const totalStockItems = inventory.length;
-  const lowStockCount = inventory.filter(i => i.stockQuantity <= i.minAlertQuantity).length;
+  const lowStockCount = inventory.filter(i => i.stockQuantity <= (i.minAlertQuantity !== undefined ? i.minAlertQuantity : 2)).length;
   const outOfStockCount = inventory.filter(i => i.stockQuantity === 0).length;
   const totalInventoryValue = inventory.reduce((sum, item) => sum + (item.stockQuantity * (item.unitPrice || 0)), 0);
 
@@ -62,16 +38,17 @@ router.get('/dashboard', (req, res) => {
   dispatches.forEach(d => {
     (d.itemsIssued || []).forEach(item => {
       if (item.qtyUsed > 0) {
-        if (!partUsageMap[item.partId]) {
-          partUsageMap[item.partId] = {
-            partId: item.partId,
-            partNumber: item.partNumber,
-            partName: item.partName,
+        const pId = item.partId || item.partNumber || item.partName;
+        if (!partUsageMap[pId]) {
+          partUsageMap[pId] = {
+            partId: pId,
+            partNumber: item.partNumber || 'N/A',
+            partName: item.partName || item.name || 'Spare Part',
             totalUsed: 0,
-            unit: item.unit
+            unit: item.unit || 'Nos'
           };
         }
-        partUsageMap[item.partId].totalUsed += item.qtyUsed;
+        partUsageMap[pId].totalUsed += Number(item.qtyUsed) || 0;
       }
     });
   });
@@ -90,8 +67,8 @@ router.get('/dashboard', (req, res) => {
     return {
       id: tech.id,
       name: tech.name,
-      designation: tech.designation,
-      status: tech.status,
+      designation: tech.designation || 'Technician',
+      status: tech.status || 'Available',
       totalVisits: visits.length,
       activeVisits: active,
       completedVisits: completed
@@ -111,7 +88,7 @@ router.get('/dashboard', (req, res) => {
         completedJobs: completedDispatches.length
       },
       activeDispatches: activeDispatches.slice(0, 5),
-      lowStockAlerts: inventory.filter(i => i.stockQuantity <= i.minAlertQuantity).slice(0, 6),
+      lowStockAlerts: inventory.filter(i => i.stockQuantity <= (i.minAlertQuantity !== undefined ? i.minAlertQuantity : 2)).slice(0, 6),
       topUsedParts,
       technicianActivity: techActivity,
       recentTransactions: (db.inventoryTransactions || []).slice(-10).reverse()
