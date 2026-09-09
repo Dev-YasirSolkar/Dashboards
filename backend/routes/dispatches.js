@@ -44,10 +44,47 @@ function generateDispatchCode(db) {
 router.get('/', async (req, res) => {
   let db = getDatabase();
 
-  // Cold start fallback: pull from Firestore if memory cache is empty
+  // Cold start fallback: pull from Firestore and Google Sheets if memory cache is empty
   if (!db.dispatches || db.dispatches.length === 0) {
     await pullFromFirestore();
     db = getDatabase();
+    if (!db.dispatches || db.dispatches.length === 0) {
+      try {
+        const { fetchAllDataFromGoogleSheets } = require('../googleSheets');
+        const sheetData = await fetchAllDataFromGoogleSheets(true);
+        if (sheetData && Array.isArray(sheetData.dispatches) && sheetData.dispatches.length > 0) {
+          db.dispatches = sheetData.dispatches.map(d => ({
+            id: 'dsp-' + uuidv4().slice(0, 8),
+            dispatchCode: d.dispatchCode,
+            clientName: d.clientName || 'Client Site',
+            siteAddress: d.siteAddress || '',
+            contactPerson: '',
+            forkliftModel: d.forkliftModel || 'Standard Forklift',
+            forkliftSerialNo: '',
+            issueDescription: d.workSummary || 'Service Visit',
+            dispatchDate: (() => {
+              const raw = d.dispatchDate || '';
+              const cleaned = String(raw).replace(/Outward:\s*/gi, '').replace(/Returned:\s*/gi, '').replace(/\s*\([\d:\sAPM]+\)/gi, '').split('\n')[0].trim();
+              return cleaned || new Date().toISOString().split('T')[0];
+            })(),
+            dispatchTime: d.dispatchTime || '10:00 AM',
+            leadTechnician: (() => {
+              const rawTechStr = d.leadTechnician || 'Technician';
+              return String(rawTechStr).split('\n')[0].replace(/\s*\([\s\S]*$/, '').trim() || 'Technician';
+            })(),
+            teamMembers: [],
+            status: normalizeStatus(d.status || 'COMPLETED'),
+            itemsIssued: parseItemsIssued(d.itemsIssuedRaw || d.itemsIssued),
+            workSummary: d.workSummary || '',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          }));
+          saveDatabase(db);
+        }
+      } catch (err) {
+        console.warn('[Dispatches GET Google Sheets fallback warn]:', err.message);
+      }
+    }
   }
 
   const { status, employee, client, startDate, endDate, search } = req.query;

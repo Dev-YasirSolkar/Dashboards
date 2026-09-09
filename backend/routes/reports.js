@@ -236,9 +236,77 @@ router.post('/sync-from-sheets', async (req, res) => {
 });
 
 // GET Stock Audit Ledger
-router.get('/ledger', (req, res) => {
-  const db = getDatabase();
+router.get('/ledger', async (req, res) => {
+  let db = getDatabase();
+
+  if ((!db.inventoryTransactions || db.inventoryTransactions.length === 0) && (!db.dispatches || db.dispatches.length === 0)) {
+    await pullFromFirestore();
+    db = getDatabase();
+  }
+
   let ledger = [...(db.inventoryTransactions || [])];
+
+  // Derive audit entries from dispatches if inventoryTransactions list is empty or sparse
+  const dispatchTxSet = new Set(ledger.map(l => l.referenceId));
+
+  (db.dispatches || []).forEach(d => {
+    if (!dispatchTxSet.has(d.dispatchCode)) {
+      const items = Array.isArray(d.itemsIssued) ? d.itemsIssued : parseItemsIssued(d.itemsIssued);
+      items.forEach((item, idx) => {
+        const issued = Number(item.qtyIssued) || 0;
+        const used = Number(item.qtyUsed) || 0;
+        const returned = Number(item.qtyReturned) || 0;
+
+        if (issued > 0) {
+          ledger.push({
+            id: `tx-out-${d.id}-${idx}`,
+            timestamp: d.createdAt || d.dispatchDate || new Date().toISOString(),
+            type: 'DISPATCH_ISSUE',
+            partId: item.partId || 'part-' + uuidv4().slice(0, 6),
+            partNumber: item.partNumber || 'N/A',
+            partName: item.partName || item.name || 'Spare Part',
+            quantityChanged: -issued,
+            balanceAfter: 'N/A',
+            referenceId: d.dispatchCode,
+            employeeName: d.leadTechnician || 'Technician',
+            notes: `Parts issued for site visit at ${d.clientName}`
+          });
+        }
+
+        if (used > 0) {
+          ledger.push({
+            id: `tx-use-${d.id}-${idx}`,
+            timestamp: d.returnDate || d.updatedAt || new Date().toISOString(),
+            type: 'RECONCILIATION_USE',
+            partId: item.partId || 'part-' + uuidv4().slice(0, 6),
+            partNumber: item.partNumber || 'N/A',
+            partName: item.partName || item.name || 'Spare Part',
+            quantityChanged: -used,
+            balanceAfter: 'N/A',
+            referenceId: d.dispatchCode,
+            employeeName: d.leadTechnician || 'Technician',
+            notes: `Parts installed/used at ${d.clientName} site`
+          });
+        }
+
+        if (returned > 0) {
+          ledger.push({
+            id: `tx-ret-${d.id}-${idx}`,
+            timestamp: d.returnDate || d.updatedAt || new Date().toISOString(),
+            type: 'RECONCILIATION_RETURN',
+            partId: item.partId || 'part-' + uuidv4().slice(0, 6),
+            partNumber: item.partNumber || 'N/A',
+            partName: item.partName || item.name || 'Spare Part',
+            quantityChanged: returned,
+            balanceAfter: 'N/A',
+            referenceId: d.dispatchCode,
+            employeeName: d.leadTechnician || 'Technician',
+            notes: `Unused parts returned to godown from ${d.clientName}`
+          });
+        }
+      });
+    }
+  });
 
   const { partId, employee, startDate, endDate, search } = req.query;
 
@@ -263,9 +331,9 @@ router.get('/ledger', (req, res) => {
   if (search) {
     const s = search.toLowerCase();
     ledger = ledger.filter(l => 
-      l.partName.toLowerCase().includes(s) ||
-      l.partNumber.toLowerCase().includes(s) ||
-      l.referenceId.toLowerCase().includes(s) ||
+      (l.partName || '').toLowerCase().includes(s) ||
+      (l.partNumber || '').toLowerCase().includes(s) ||
+      (l.referenceId || '').toLowerCase().includes(s) ||
       (l.notes && l.notes.toLowerCase().includes(s))
     );
   }
