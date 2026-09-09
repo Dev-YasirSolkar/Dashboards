@@ -303,11 +303,8 @@ export default function NewDispatch({ setActiveTab, onDataRefresh }) {
       return;
     }
 
-    if (issuedParts.length === 0) {
-      setError('⚠️ Kripya kam se kam 1 spare part select karein ya "+ Add Part" se add karein.');
-      window.scrollTo({ top: 400, behavior: 'smooth' });
-      return;
-    }
+    // Spare parts are optional (0 parts for Service / Inspection Visits)
+
 
     const combinedIssue = finalTasks.join(' • ');
 
@@ -829,7 +826,7 @@ export default function NewDispatch({ setActiveTab, onDataRefresh }) {
         <div className="flex items-center justify-between">
           <label className="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center space-x-1.5">
             <Package className="w-3.5 h-3.5 shrink-0" />
-            <span>4. SPARE PARTS TO ISSUE ({issuedParts.length} Selected • {inventory.length} Available in Godown)</span>
+            <span>4. SPARE PARTS TO ISSUE (OPTIONAL • {issuedParts.length} Selected)</span>
           </label>
 
           <button
@@ -842,7 +839,7 @@ export default function NewDispatch({ setActiveTab, onDataRefresh }) {
         </div>
 
         {/* Selected Items List */}
-        {issuedParts.length > 0 && (
+        {issuedParts.length > 0 ? (
           <div className="space-y-1.5 p-2.5 bg-slate-950/70 rounded-xl border border-amber-500/30">
             <span className="text-[9px] font-black text-amber-300 uppercase block">
               PARTS IN BAG:
@@ -885,6 +882,13 @@ export default function NewDispatch({ setActiveTab, onDataRefresh }) {
                 </div>
               </div>
             ))}
+          </div>
+        ) : (
+          <div className="p-2.5 bg-slate-950/60 rounded-xl border border-slate-800 flex items-center justify-between text-xs text-slate-400">
+            <span>ℹ️ Service / Maintenance Visit (0 parts issued)</span>
+            <span className="text-[10px] text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+              Parts Optional
+            </span>
           </div>
         )}
 
