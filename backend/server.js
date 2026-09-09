@@ -81,72 +81,120 @@ async function autoSyncFromSheets(force = false) {
 
     // 1. Sync Inventory
     if (Array.isArray(sheetData.inventory) && sheetData.inventory.length > 0) {
-      db.inventory = sheetData.inventory.map(item => {
-        const existing = (db.inventory || []).find(i => i.partNumber === item.partNumber);
-        return {
+      const currentInv = db.inventory || [];
+      const syncedInv = [...currentInv];
+
+      sheetData.inventory.forEach(item => {
+        if (!item.partNumber) return;
+        const idx = syncedInv.findIndex(i => i.partNumber === item.partNumber);
+        const existing = idx !== -1 ? syncedInv[idx] : null;
+
+        const merged = {
           id: existing?.id || 'part-' + uuidv4().slice(0, 8),
           partNumber: item.partNumber,
-          name: item.name,
-          category: item.category || 'General Spare Parts',
-          stockQuantity: Number(item.stockQuantity) || 0,
+          name: item.name || existing?.name || 'Spare Part',
+          category: item.category || existing?.category || 'General Spare Parts',
+          stockQuantity: item.stockQuantity !== undefined ? Number(item.stockQuantity) : (existing?.stockQuantity || 0),
           minAlertQuantity: existing?.minAlertQuantity || 2,
-          unit: item.unit || 'Nos',
-          unitPrice: Number(item.unitPrice) || 0,
-          locationRack: item.locationRack || 'Warehouse Rack',
+          unit: item.unit || existing?.unit || 'Nos',
+          unitPrice: item.unitPrice !== undefined ? Number(item.unitPrice) : (existing?.unitPrice || 0),
+          locationRack: item.locationRack || existing?.locationRack || 'Warehouse Rack',
           description: existing?.description || '',
           updatedAt: new Date().toISOString()
         };
+
+        if (idx !== -1) {
+          syncedInv[idx] = merged;
+        } else {
+          syncedInv.push(merged);
+        }
       });
+
+      db.inventory = syncedInv;
       modified = true;
     }
 
     // 2. Sync Technicians
     if (Array.isArray(sheetData.technicians) && sheetData.technicians.length > 0) {
-      db.technicians = sheetData.technicians.map(t => {
-        const existing = (db.technicians || []).find(tech => tech.name.toLowerCase() === t.name.toLowerCase());
-        return {
+      const currentTechs = db.technicians || [];
+      const syncedTechs = [...currentTechs];
+
+      sheetData.technicians.forEach(t => {
+        if (!t.name) return;
+        const idx = syncedTechs.findIndex(tech => tech.name.toLowerCase() === t.name.toLowerCase());
+        const existing = idx !== -1 ? syncedTechs[idx] : null;
+
+        const merged = {
           id: existing?.id || 'tech-' + uuidv4().slice(0, 8),
           name: t.name,
-          phone: t.phone || '',
-          designation: t.designation || 'Technician',
-          experience: t.experience || '1 Year',
-          status: t.status || 'Available'
+          phone: t.phone || existing?.phone || '',
+          designation: t.designation || existing?.designation || 'Technician',
+          experience: t.experience || existing?.experience || '1 Year',
+          status: t.status || existing?.status || 'Available'
         };
+
+        if (idx !== -1) {
+          syncedTechs[idx] = merged;
+        } else {
+          syncedTechs.push(merged);
+        }
       });
+
+      db.technicians = syncedTechs;
       modified = true;
     }
 
     // 3. Sync Clients
     if (Array.isArray(sheetData.clients) && sheetData.clients.length > 0) {
-      db.clients = sheetData.clients.map(c => {
-        const existing = (db.clients || []).find(cli => cli.clientName.toLowerCase() === c.clientName.toLowerCase());
-        return {
+      const currentClients = db.clients || [];
+      const syncedClients = [...currentClients];
+
+      sheetData.clients.forEach(c => {
+        if (!c.clientName) return;
+        const idx = syncedClients.findIndex(cli => cli.clientName.toLowerCase() === c.clientName.toLowerCase());
+        const existing = idx !== -1 ? syncedClients[idx] : null;
+
+        const merged = {
           id: existing?.id || 'cli-' + uuidv4().slice(0, 8),
           clientName: c.clientName,
-          siteAddress: c.siteAddress,
-          contactPerson: c.contactPerson || '',
-          forklifts: Array.isArray(c.forklifts) ? c.forklifts : (c.forklifts ? c.forklifts.split(',').map(s => s.trim()) : [])
+          siteAddress: c.siteAddress || existing?.siteAddress || '',
+          contactPerson: c.contactPerson || existing?.contactPerson || '',
+          forklifts: Array.isArray(c.forklifts) ? c.forklifts : (c.forklifts ? c.forklifts.split(',').map(s => s.trim()) : (existing?.forklifts || []))
         };
+
+        if (idx !== -1) {
+          syncedClients[idx] = merged;
+        } else {
+          syncedClients.push(merged);
+        }
       });
+
+      db.clients = syncedClients;
       modified = true;
     }
 
-    // 4. Sync Dispatches
+    // 4. Sync Dispatches (Safely MERGE without wiping un-synced items)
     if (Array.isArray(sheetData.dispatches) && sheetData.dispatches.length > 0) {
-      db.dispatches = sheetData.dispatches.map(d => {
-        const existing = (db.dispatches || []).find(disp => disp.dispatchCode === d.dispatchCode);
-        return {
+      const currentDispatches = db.dispatches || [];
+      const syncedDispatches = [...currentDispatches];
+
+      sheetData.dispatches.forEach(d => {
+        if (!d.dispatchCode) return;
+        const existingIndex = syncedDispatches.findIndex(disp => disp.dispatchCode === d.dispatchCode);
+        const existing = existingIndex !== -1 ? syncedDispatches[existingIndex] : null;
+
+        const mergedItem = {
           id: existing?.id || 'dsp-' + uuidv4().slice(0, 8),
           dispatchCode: d.dispatchCode,
-          clientName: d.clientName || 'Client Site',
-          siteAddress: d.siteAddress || '',
+          clientName: d.clientName || existing?.clientName || 'Client Site',
+          siteAddress: d.siteAddress || existing?.siteAddress || '',
           contactPerson: existing?.contactPerson || '',
-          forkliftModel: d.forkliftModel || 'Standard Forklift',
+          forkliftModel: d.forkliftModel || existing?.forkliftModel || 'Standard Forklift',
           forkliftSerialNo: existing?.forkliftSerialNo || '',
           issueDescription: d.workSummary || existing?.issueDescription || 'Service Visit',
           dispatchDate: d.dispatchDate || existing?.dispatchDate || new Date().toISOString().split('T')[0],
           dispatchTime: d.dispatchTime || existing?.dispatchTime || '10:00 AM',
-          leadTechnician: d.leadTechnician || 'Technician',
+          leadTechnician: d.leadTechnician || existing?.leadTechnician || 'Technician',
           teamMembers: existing?.teamMembers || [],
           status: normalizeStatus(d.status || existing?.status || 'COMPLETED'),
           itemsIssued: (() => {
@@ -170,7 +218,15 @@ async function autoSyncFromSheets(force = false) {
           createdAt: existing?.createdAt || new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };
+
+        if (existingIndex !== -1) {
+          syncedDispatches[existingIndex] = mergedItem;
+        } else {
+          syncedDispatches.push(mergedItem);
+        }
       });
+
+      db.dispatches = syncedDispatches;
       modified = true;
     }
 
