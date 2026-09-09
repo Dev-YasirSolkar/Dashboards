@@ -1,4 +1,4 @@
-const GOOGLE_SHEETS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbztjfLofa_py8aUDYt-q5D7N0R-zeo7klycwpUyjxyOKccY0fbkf9J0gGDKXzm20D3Vew/exec';
+const GOOGLE_SHEETS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwEhtRKVcMRhnzO8aoX-rgGAuOJStwlpgCV_H4B76k7Tvkx9GFWB40ojRtuITbxyEysKg/exec';
 
 let lastWriteTimestamp = 0;
 
