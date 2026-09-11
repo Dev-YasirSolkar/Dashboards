@@ -37,24 +37,8 @@ export default function Navbar({
   const [showProfileModal, setShowProfileModal] = useState(false);
 
   const desktopNavItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: Layers },
-    { 
-      id: 'active', 
-      label: 'Site Visits', 
-      icon: Truck, 
-      badge: activeVisitsCount > 0 ? activeVisitsCount : null,
-      badgeColor: 'bg-amber-500 text-slate-950 font-black animate-pulse' 
-    },
-    { id: 'new-dispatch', label: '+ New Dispatch', icon: Plus, highlight: true },
-    { 
-      id: 'inventory', 
-      label: 'Warehouse Stock', 
-      icon: Package,
-      badge: lowStockCount > 0 ? lowStockCount : null,
-      badgeColor: 'bg-rose-500 text-white font-bold'
-    },
-    { id: 'history', label: 'History & Logs', icon: FileText },
-    { id: 'staff', label: 'Technicians & Sites', icon: Users },
+    { id: 'dashboard', label: 'Master Sheet Dashboard', icon: Layers },
+    { id: 'new-dispatch', label: '+ New Service Entry', icon: Plus, highlight: true },
   ];
 
   const userInitial = currentUser?.email ? currentUser.email.charAt(0).toUpperCase() : 'U';
@@ -274,11 +258,11 @@ export default function Navbar({
         </div>
       )}
 
-      {/* 5-BUTTON MOBILE BOTTOM APP BAR (2 Left, Floating Half-Raised '+' Center, 2 Right) */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800/90 shadow-[0_-8px_30px_rgba(0,0,0,0.6)] px-2 py-1.5 no-print">
-        <div className="flex items-center justify-around max-w-md mx-auto relative">
+      {/* MOBILE BOTTOM APP BAR */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800/90 px-4 py-2 no-print shadow-[0_-8px_30px_rgba(0,0,0,0.6)]">
+        <div className="flex items-center justify-around max-w-xs mx-auto">
           
-          {/* LEFT 1: Dashboard / Home */}
+          {/* Dashboard / Home */}
           <button
             onClick={() => setActiveTab('dashboard')}
             className={`flex-1 flex flex-col items-center justify-center py-1 rounded-2xl active:scale-95 transition-all ${
@@ -286,78 +270,20 @@ export default function Navbar({
             }`}
           >
             <Layers className={`w-5 h-5 ${activeTab === 'dashboard' ? 'text-amber-400 stroke-[2.5]' : 'text-slate-400'}`} />
-            <span className="text-[10px] font-bold tracking-tight mt-0.5">Home</span>
+            <span className="text-[10px] font-bold tracking-tight mt-0.5">Master Sheet</span>
             {activeTab === 'dashboard' && <span className="w-1 h-1 rounded-full bg-amber-400 mt-0.5"></span>}
           </button>
 
-          {/* LEFT 2: Active Site Trips */}
+          {/* New Dispatch */}
           <button
-            onClick={() => setActiveTab('active')}
-            className={`flex-1 flex flex-col items-center justify-center py-1 rounded-2xl active:scale-95 transition-all relative ${
-              activeTab === 'active' ? 'text-amber-400 font-black' : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <div className="relative">
-              <Truck className={`w-5 h-5 ${activeTab === 'active' ? 'text-amber-400 stroke-[2.5]' : 'text-slate-400'}`} />
-              {activeVisitsCount > 0 && (
-                <span className="absolute -top-1 -right-2.5 text-[9px] w-4 h-4 rounded-full bg-amber-500 text-slate-950 font-black flex items-center justify-center animate-pulse">
-                  {activeVisitsCount}
-                </span>
-              )}
-            </div>
-            <span className="text-[10px] font-bold tracking-tight mt-0.5">On-Site</span>
-            {activeTab === 'active' && <span className="w-1 h-1 rounded-full bg-amber-400 mt-0.5"></span>}
-          </button>
-
-          {/* CENTER: Floating Half-Raised '+' CTA Button */}
-          <div className="relative -top-5 px-2 flex flex-col items-center">
-            <button
-              onClick={() => setActiveTab('new-dispatch')}
-              className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl shadow-amber-500/40 border-4 border-slate-950 transition-all active:scale-90 ${
-                activeTab === 'new-dispatch'
-                  ? 'bg-amber-400 text-slate-950 ring-4 ring-amber-400/40 scale-105'
-                  : 'bg-gradient-to-tr from-amber-500 via-amber-400 to-amber-500 text-slate-950 hover:brightness-110'
-              }`}
-              title="Create New Site Dispatch"
-            >
-              <Plus className="w-8 h-8 stroke-[3.5]" />
-            </button>
-            <span className={`text-[10px] font-black tracking-tight mt-1 ${
-              activeTab === 'new-dispatch' ? 'text-amber-400' : 'text-slate-300'
-            }`}>
-              Dispatch
-            </span>
-          </div>
-
-          {/* RIGHT 1: Warehouse Inventory */}
-          <button
-            onClick={() => setActiveTab('inventory')}
-            className={`flex-1 flex flex-col items-center justify-center py-1 rounded-2xl active:scale-95 transition-all relative ${
-              activeTab === 'inventory' ? 'text-amber-400 font-black' : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <div className="relative">
-              <Package className={`w-5 h-5 ${activeTab === 'inventory' ? 'text-amber-400 stroke-[2.5]' : 'text-slate-400'}`} />
-              {lowStockCount > 0 && (
-                <span className="absolute -top-1 -right-2.5 text-[9px] w-4 h-4 rounded-full bg-rose-500 text-white font-black flex items-center justify-center">
-                  {lowStockCount}
-                </span>
-              )}
-            </div>
-            <span className="text-[10px] font-bold tracking-tight mt-0.5">Stock</span>
-            {activeTab === 'inventory' && <span className="w-1 h-1 rounded-full bg-amber-400 mt-0.5"></span>}
-          </button>
-
-          {/* RIGHT 2: Staff & Sites */}
-          <button
-            onClick={() => setActiveTab('staff')}
+            onClick={() => setActiveTab('new-dispatch')}
             className={`flex-1 flex flex-col items-center justify-center py-1 rounded-2xl active:scale-95 transition-all ${
-              activeTab === 'staff' ? 'text-amber-400 font-black' : 'text-slate-400 hover:text-slate-200'
+              activeTab === 'new-dispatch' ? 'text-amber-400 font-black' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            <Users className={`w-5 h-5 ${activeTab === 'staff' ? 'text-amber-400 stroke-[2.5]' : 'text-slate-400'}`} />
-            <span className="text-[10px] font-bold tracking-tight mt-0.5">Staff</span>
-            {activeTab === 'staff' && <span className="w-1 h-1 rounded-full bg-amber-400 mt-0.5"></span>}
+            <Plus className={`w-5 h-5 ${activeTab === 'new-dispatch' ? 'text-amber-400 stroke-[2.5]' : 'text-slate-400'}`} />
+            <span className="text-[10px] font-bold tracking-tight mt-0.5">+ New Entry</span>
+            {activeTab === 'new-dispatch' && <span className="w-1 h-1 rounded-full bg-amber-400 mt-0.5"></span>}
           </button>
 
         </div>

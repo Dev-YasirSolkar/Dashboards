@@ -144,10 +144,7 @@ export default function Dashboard({ setActiveTab, onDataRefresh }) {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
         
         {/* Card 1: Active Trips */}
-        <button
-          onClick={() => setActiveTab('active')}
-          className="p-4 rounded-3xl bg-slate-900 border border-slate-800 text-left hover:border-blue-500/40 active:scale-95 transition-all flex flex-col justify-between h-32 relative overflow-hidden group shadow-lg"
-        >
+        <div className="p-4 rounded-3xl bg-slate-900 border border-slate-800 text-left flex flex-col justify-between h-32 relative overflow-hidden group shadow-lg">
           <div className="flex items-center justify-between">
             <div className="w-10 h-10 rounded-2xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center">
               <Truck className="w-5 h-5" />
@@ -157,10 +154,10 @@ export default function Dashboard({ setActiveTab, onDataRefresh }) {
             </span>
           </div>
           <div>
-            <strong className="text-white text-xs sm:text-sm font-black block whitespace-nowrap">Active Trips</strong>
-            <span className="text-[10px] text-slate-400 whitespace-nowrap">Reconcile & Return ➜</span>
+            <strong className="text-white text-xs sm:text-sm font-black block whitespace-nowrap">On-Site Visits</strong>
+            <span className="text-[10px] text-slate-400 whitespace-nowrap">Real-Time Single Sheet</span>
           </div>
-        </button>
+        </div>
 
         {/* Card 2: Warehouse Stock */}
         <button
@@ -182,22 +179,22 @@ export default function Dashboard({ setActiveTab, onDataRefresh }) {
           </div>
         </button>
 
-        {/* Card 3: Staff & Technicians */}
+        {/* Card 3: Create Service Entry */}
         <button
-          onClick={() => setActiveTab('staff')}
-          className="p-4 rounded-3xl bg-slate-900 border border-slate-800 text-left hover:border-purple-500/40 active:scale-95 transition-all flex flex-col justify-between h-32 group shadow-lg"
+          onClick={() => setActiveTab('new-dispatch')}
+          className="p-4 rounded-3xl bg-slate-900 border border-slate-800 text-left hover:border-amber-500/40 active:scale-95 transition-all flex flex-col justify-between h-32 group shadow-lg"
         >
           <div className="flex items-center justify-between">
-            <div className="w-10 h-10 rounded-2xl bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center justify-center">
-              <Users className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center">
+              <Plus className="w-5 h-5 stroke-[2.5]" />
             </div>
-            <span className="text-xs font-mono font-black text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/30">
-              Directory
+            <span className="text-xs font-mono font-black text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/30">
+              New Entry
             </span>
           </div>
           <div>
-            <strong className="text-white text-xs sm:text-sm font-black block">Technicians & Sites</strong>
-            <span className="text-[10px] text-slate-400">Manage Team ➜</span>
+            <strong className="text-white text-xs sm:text-sm font-black block">Create Service Pass</strong>
+            <span className="text-[10px] text-slate-400">+ Outward Entry ➜</span>
           </div>
         </button>
 

@@ -1,18 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
-import ActiveVisits from './pages/ActiveVisits';
 import NewDispatch from './pages/NewDispatch';
-import Inventory from './pages/Inventory';
-import HistoryReports from './pages/HistoryReports';
-import TechniciansClients from './pages/TechniciansClients';
 import Login from './pages/Login';
 import PendingApproval from './pages/PendingApproval';
 import UserApprovalsPage from './pages/UserApprovalsPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { api } from './api';
 
-const VALID_TABS = ['dashboard', 'active', 'new-dispatch', 'inventory', 'history', 'staff', 'approvals'];
+const VALID_TABS = ['dashboard', 'new-dispatch', 'approvals'];
 
 function MainApp() {
   const { currentUser, userStatus, loading } = useAuth();
@@ -122,32 +118,11 @@ function MainApp() {
           />
         )}
 
-        {activeTab === 'active' && (
-          <ActiveVisits 
-            setActiveTab={setActiveTab} 
-            onDataRefresh={() => fetchSummaryBadges(false)} 
-          />
-        )}
-
         {activeTab === 'new-dispatch' && (
           <NewDispatch 
             setActiveTab={setActiveTab} 
             onDataRefresh={() => fetchSummaryBadges(false)} 
           />
-        )}
-
-        {activeTab === 'inventory' && (
-          <Inventory 
-            onDataRefresh={() => fetchSummaryBadges(false)} 
-          />
-        )}
-
-        {activeTab === 'history' && (
-          <HistoryReports />
-        )}
-
-        {activeTab === 'staff' && (
-          <TechniciansClients />
         )}
 
         {activeTab === 'approvals' && (
@@ -159,7 +134,7 @@ function MainApp() {
 
       {/* Footer */}
       <footer className="border-t border-slate-900 bg-slate-950 py-6 text-center text-xs text-slate-600 no-print pb-24 md:pb-6">
-        <p>VE INVENTORY • Spares & Site Service Operations System • Real-Time Cloud Sync & Security Enabled</p>
+        <p>VE INVENTORY • Single Master Sheet Operational App • Real-Time Cloud Sync Enabled</p>
       </footer>
 
     </div>
